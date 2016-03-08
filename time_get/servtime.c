@@ -1,9 +1,4 @@
-#include <stdio.h>
-#include <sys/types.h> 
-#include <sys/socket.h>
-#include <time.h>
-#include <string.h>
-#include <netinet/in.h>
+#include <zwunp.h>
 
 int main()
 {
@@ -39,7 +34,9 @@ int main()
 		Connfd = accept(listenfd, NULL, NULL);
 		ticks = time(NULL);
 		snprintf(buff, sizeof(buff), "%.24s\r\n", ctime(&ticks));
-		write(Connfd, &buff, strlen(buff));
+		if( write(Connfd, &buff, strlen(buff))<0 )
+			perror("write error");
+		
 		close(Connfd);
 	}
 	

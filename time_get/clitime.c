@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include <sys/types.h> 
-#include <netinet/in.h>
-#include <strings.h>
+#include "zwunp.h"
  
 int main(int argc, char **argv)
 {

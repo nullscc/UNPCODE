@@ -1,12 +1,12 @@
-all: clitime servtime
+include ../config
 
-clitime:clitime.c
-	gcc -o clitime clitime.c
+PROGS = clitime servtime
+
+all:${PROGS}
 	
-servtime:servtime.c
-	gcc -o servtime servtime.c
-
-.PHONY: all clean
-
+clitime:clitime.o ../libzwunp.a
+	${CC} ${CFLAGS} -o $@ $^
+servtime:servtime.o ../libzwunp.a
+	${CC} ${CFLAGS} -o $@ $^
 clean:
-	rm cli.out serv.out
+	rm -f ${PROGS} *.o
