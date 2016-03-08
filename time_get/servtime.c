@@ -7,41 +7,40 @@
 
 int main()
 {
-	int sockfd;
-	int Connetedfd;
+	int listenfd;
+	int Connfd; 
 	char buff[100];
-	struct sockaddr_in servaddr; //在netinet/in.h中定义
+	struct sockaddr_in servaddr;
 	time_t ticks;
-	if( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1 )
+	if( (listenfd = socket(AF_INET, SOCK_STREAM, 0)) == -1 )
 	{
-		printf("create socket error\n");	
+		perror("create socket error");	
 		return -1;
 	}
-	
+	bzero(&servaddr, sizeof(servaddr));
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_port = htons(13);
-	inet_aton("127.0.0.1", &servaddr.sin_addr);
-	
-	if( bind(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr)) == -1)
+	//inet_aton("127.0.0.1", &servaddr.sin_addr);
+	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	if( bind(listenfd, (struct sockaddr*)&servaddr, sizeof(servaddr)) == -1)
 	{
-		printf("bind error\n");	
+		perror("bind error");	
 		return -1;
 	}
 	
-	if( listen(sockfd, 10) == -1)
+	if( listen(listenfd, 10) == -1)
 	{
-		printf("listen failed\n");
+		perror("listen failed");
 		return -1;	
 	}
 	
 	for( ; ;)
 	{
-		Connetedfd = accept(sockfd, NULL, NULL);
+		Connfd = accept(listenfd, NULL, NULL);
 		ticks = time(NULL);
 		snprintf(buff, sizeof(buff), "%.24s\r\n", ctime(&ticks));
-		write(Connetedfd, &buff, strlen(buff));
-		close(Connetedfd);
-		break;
+		write(Connfd, &buff, strlen(buff));
+		close(Connfd);
 	}
 	
 	return 0;

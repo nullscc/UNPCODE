@@ -1,26 +1,34 @@
 #include <stdio.h>
 #include <sys/types.h> 
- #include <netinet/in.h>
+#include <netinet/in.h>
+#include <strings.h>
  
-int main()
+int main(int argc, char **argv)
 {
 		int sock_fd, n;
 		int ret;
 		char recieve[100];
-		struct sockaddr_in time_addr;
-		time_addr.sin_family = AF_INET;
-		time_addr.sin_port = htons(13);
-		inet_aton("127.0.0.1", &time_addr.sin_addr);
+		struct sockaddr_in serv_addr; //serv_addr
+		if( argc != 2)
+		{
+			printf("Usage:%s <IPaddress>\n", argv[0]);
+			return -1;
+		}
+		bzero(&serv_addr, sizeof(serv_addr));
+		serv_addr.sin_family = AF_INET;
+		serv_addr.sin_port = htons(13);
+		//inet_aton("127.0.0.1", &serv_addr.sin_addr);
+		inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr);
 		
 		if((sock_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 		{
-			printf("create socket failed\n");
+			perror("create socket failed");
 			return -1;	
 		}
 	
-		if((ret = connect(sock_fd, (const struct sockaddr*)&time_addr, sizeof(struct sockaddr_in))) == -1)
+		if((ret = connect(sock_fd, (const struct sockaddr*)&serv_addr, sizeof(struct sockaddr_in))) == -1)
 		{
-			printf("connect error\n");	
+			perror("connect error");	
 			return -1;
 		}
 		
@@ -29,13 +37,13 @@ int main()
 			recieve[n] = 0;
 			if(fputs(recieve, stdout) == EOF)	
 			{
-				printf("error fputs\n");	
+				perror("error fputs");	
 			}
 		}
 		
 		if(n<0)
 		{
-				printf("read error\n");
+				perror("read error");
 		}
 		return 0;
 }
