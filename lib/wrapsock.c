@@ -1,4 +1,7 @@
 #include "zwunp.h"
+#include<stdio.h>
+#include<stdlib.h>
+
 
 int Socket(int domain, int type, int protocol)
 {
@@ -26,7 +29,7 @@ int Bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 int Connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {
 	int ret;
-	if( (ret =  Connect(sockfd, addr, addrlen)) < 0 )
+	if( (ret =  connect(sockfd, addr, addrlen)) < 0 )
 	{
 		perror("bind error");
 		return -1;
@@ -38,11 +41,13 @@ int Connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 int Listen(int sockfd, int backlog)
 {
 	int ret;
+	#if 0
 	char	*ptr;
 
 	if ( (ptr = getenv("LISTENQ")) != NULL)
 		backlog = atoi(ptr);
-	if( (ret =  Listen(sockfd, backlog)) < 0 )
+	#endif
+	if( (ret =  listen(sockfd, backlog)) < 0 )
 	{
 		perror("listen error");
 		return -1;

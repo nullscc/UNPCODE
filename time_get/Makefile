@@ -8,5 +8,7 @@ clitime:clitime.o ../libzwunp.a
 	${CC} ${CFLAGS} -o $@ $^
 servtime:servtime.o ../libzwunp.a
 	${CC} ${CFLAGS} -o $@ $^
+
+
 clean:
 	rm -f ${PROGS} *.o
