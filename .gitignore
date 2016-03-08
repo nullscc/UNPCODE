@@ -2,3 +2,4 @@ si
 servtime
 clitime
 *.o
+*.a

@@ -1,0 +1,3 @@
+CC = gcc
+CFLAGS = -I../lib -Wall -o2 
+RANLIB = ranlib
