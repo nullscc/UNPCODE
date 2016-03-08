@@ -1,5 +1,9 @@
 #include "zwunp.h"
- 
+#include<stdlib.h>
+#include<stdio.h>
+#include <strings.h>
+#include <unistd.h>
+
 int main(int argc, char **argv)
 {
 		int sock_fd, n;

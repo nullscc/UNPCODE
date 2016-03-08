@@ -1,4 +1,11 @@
-#include <zwunp.h>
+#include "zwunp.h"
+#include<stdlib.h>
+#include<stdio.h>
+#include <strings.h>
+#include <time.h>
+#include <unistd.h>
+#include <string.h>
+
 
 int main()
 {
