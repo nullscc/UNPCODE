@@ -1,12 +1,12 @@
-all: cli serv
+all: clitime servtime
 
-cli:clitime.c
-	gcc -o cli.out clitime.c
+clitime:clitime.c
+	gcc -o clitime clitime.c
 	
-serv:servtime.c
-	gcc -o serv.out servtime.c
+servtime:servtime.c
+	gcc -o servtime servtime.c
 
-.PHONY: all clean serv cli
+.PHONY: all clean
 
 clean:
 	rm cli.out serv.out
