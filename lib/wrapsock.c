@@ -9,7 +9,7 @@ int Socket(int domain, int type, int protocol)
 	if( (sockfd = socket(domain, type, protocol)) < 0  )
 	{
 		perror("create socketfd error");
-		return -1;
+		exit(1);
 	}
 	return sockfd;
 }
@@ -20,7 +20,7 @@ int Bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 	if( (ret =  bind(sockfd, addr, addrlen)) < 0 )
 	{
 		perror("bind error");
-		return -1;
+		exit(1);
 	}
 	return ret;
 }
@@ -32,7 +32,7 @@ int Connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 	if( (ret =  connect(sockfd, addr, addrlen)) < 0 )
 	{
 		perror("bind error");
-		return -1;
+		exit(1);
 	}
 	
 	return ret;
@@ -50,7 +50,7 @@ int Listen(int sockfd, int backlog)
 	if( (ret =  listen(sockfd, backlog)) < 0 )
 	{
 		perror("listen error");
-		return -1;
+		exit(1);
 	}
 
 	return ret;
@@ -65,9 +65,9 @@ int Accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 	{
 		perror("listen error");
 
-		//to be fixed;
+		//to be fixed,case errno
 		
-		return -1;
+		exit(1);
 	}
 
 	return connfd;
