@@ -11,6 +11,7 @@ void strecho(int fd)
 	while( (n = read(fd, buf, MAXLINE)) > 0)
 	{	
 		write(fd, buf, strlen(buf)); 
+		bzero(buf, MAXLINE);
 	}
 
 }
