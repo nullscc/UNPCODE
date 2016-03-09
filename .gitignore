@@ -1,7 +1,7 @@
 si
 servtime
 clitime
-cliecho
-srvecho
 *.o
 *.a
+cliecho
+srvecho
