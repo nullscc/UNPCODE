@@ -10,6 +10,9 @@
 
 #define	MAXLINE		4096	/* max text line length */
 
+//typedef struct sockaddr SA;  // why error
+#define SA struct sockaddr
+
 int Socket(int domain, int type, int protocol);
 
 

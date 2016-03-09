@@ -1,6 +1,7 @@
 #include "zwunp.h"
-#include<stdio.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
 
 
 int Socket(int domain, int type, int protocol)
@@ -61,13 +62,19 @@ int Accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {
 	int connfd;
 
-	if( (connfd =  accept(sockfd, addr, addrlen)) < 0 )
-	{
-		perror("listen error");
-
-		//to be fixed,case errno
-		
-		exit(1);
+	again:
+	if ( (connfd = accept(sockfd, addr, addrlen)) < 0) {
+#ifdef	EPROTO
+		if (errno == EPROTO || errno == ECONNABORTED)
+#else
+		if (errno == ECONNABORTED)
+#endif
+			goto again;
+		else
+		{
+			perror("accept error");
+			exit(1);
+		}
 	}
 
 	return connfd;
