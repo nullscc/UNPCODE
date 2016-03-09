@@ -11,6 +11,7 @@ void strcli(FILE* fp, int fd)
 	while( fgets(buf, MAXLINE, fp) != NULL)
 	{
 		write(fd, buf, strlen(buf));
+		
 		read(fd, echobuf, MAXLINE);
 		fputs(echobuf, stdout);
 	}

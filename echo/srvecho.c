@@ -8,20 +8,9 @@ void strecho(int fd)
 	int n;
 	char buf[MAXLINE];
 	while( (n = read(fd, buf, MAXLINE)) > 0)
-	{
-		//printf("recieve:%s\n", buf);
-		
+	{	
 		write(fd, buf, strlen(buf)); 
-
 	}
-	/*
-	else if(n == 0)
-		printf("end of file\n");
-	else
-	{
-		perror("read error\n");
-	}
-	*/
 
 }
 
@@ -40,7 +29,7 @@ int main()
 	Bind(listenfd, (SA *)&srvaddr, sizeof(srvaddr));
 	Listen(listenfd, 10);
 
-	while( (connfd = Accept(listenfd, NULL, NULL) > 0) )
+	while( (connfd = Accept(listenfd, NULL, NULL)) > 0 )
 	{
 		if(0 == fork())
 		{
