@@ -13,6 +13,8 @@ int main()
 	int Connfd; 
 	char buff[100];
 	struct sockaddr_in servaddr;
+	struct sockaddr_in cliaddr;
+	socklen_t cliaddrlen;
 	time_t ticks;
 	
 	listenfd = Socket(AF_INET, SOCK_STREAM, 0);
@@ -28,7 +30,9 @@ int main()
 	
 	for( ; ;)
 	{
-		Connfd = Accept(listenfd, NULL, NULL);
+		cliaddrlen = sizeof(cliaddr);
+		Connfd = Accept(listenfd, (struct sockaddr*)&cliaddr, &cliaddrlen);
+		printf("connect from:%s,port:%d\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
 		ticks = time(NULL);
 		snprintf(buff, sizeof(buff), "%.24s\r\n", ctime(&ticks));
 		if( write(Connfd, &buff, strlen(buff))<0 )
