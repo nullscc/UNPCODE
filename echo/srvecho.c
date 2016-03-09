@@ -1,6 +1,7 @@
 #include "zwunp.h"
 #include <unistd.h>
 #include <string.h>
+#include <stdlib.h>
 
 
 void strecho(int fd)
@@ -35,6 +36,7 @@ int main()
 		{
 			close(listenfd);
 			strecho(connfd);
+			exit(0);
 		}
 		else
 		{
