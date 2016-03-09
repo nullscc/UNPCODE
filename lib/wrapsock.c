@@ -31,7 +31,7 @@ int Connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 	int ret;
 	if( (ret =  connect(sockfd, addr, addrlen)) < 0 )
 	{
-		perror("bind error");
+		perror("connect error");
 		exit(1);
 	}
 	
