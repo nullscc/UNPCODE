@@ -25,8 +25,8 @@ int main()
 
 	srvaddr.sin_family = AF_INET;
 	srvaddr.sin_port = htons(6677);
-	inet_aton("127.0.0.1", &srvaddr.sin_addr);
-
+	//inet_aton("127.0.0.1", &srvaddr.sin_addr);
+	srvaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	
 	Bind(listenfd, (SA *)&srvaddr, sizeof(srvaddr));
 	Listen(listenfd, 10);

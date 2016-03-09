@@ -21,8 +21,8 @@ int main()
 	bzero(&servaddr, sizeof(servaddr));
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_port = htons(13);
-	inet_aton("127.0.0.1", &servaddr.sin_addr);
-	//servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	//inet_aton("127.0.0.1", &servaddr.sin_addr);
+	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	
 	Bind(listenfd, (struct sockaddr*)&servaddr, sizeof(servaddr));
 
