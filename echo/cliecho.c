@@ -9,12 +9,16 @@ void strcli(FILE* fp, int fd)
 	char buf[MAXLINE];
 	char echobuf[MAXLINE];
 
-	while( fgets(buf, MAXLINE, fp) != NULL)
+	while( Fgets(buf, MAXLINE, fp) != NULL)
 	{
-		write(fd, buf, strlen(buf));
+		Writen(fd, buf, strlen(buf));
 
-		read(fd, echobuf, MAXLINE);
-		fputs(echobuf, stdout);
+		if(read(fd, echobuf, MAXLINE) == 0)
+		{
+			perror("read error:server terminted premature");
+			return -1;
+		}
+		Fputs(echobuf, stdout);
 		//printf("%s", echobuf);
 		memset(echobuf, 0, MAXLINE);
 		

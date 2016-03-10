@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-
+#include <unistd.h>
 
 int Socket(int domain, int type, int protocol)
 {
@@ -80,6 +80,61 @@ int Accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 	return connfd;
 }
 
+ssize_t writen(int fd, const void *buf, size_t count)
+{
+	ssize_t ntowrite;
+	ssize_t n;
+	const char *pbuf;
 
+	ntowrite = count;
+	pbuf = buf;
+again:
+	if( (n = write(fd, pbuf, ntowrite)) <= 0 )
+	{
+		if ( (errno == EINTR) && (n < 0) )
+		{
+			ntowrite -= n;
+			pbuf += n;
+			goto again;
+		}
+		else
+			return -1;
+	}
+	return count;	
+}
+
+
+ssize_t Writen(int fd, const void *buf, size_t count)
+{	
+	if( writen(fd, buf, count) != count )
+	{
+		perror("writen error");
+		return -1;
+	}
+	return count;
+}
+
+
+char *Fgets(char *s, int size, FILE *stream)
+{
+	char *str;
+	if( (str = fgets(s, size, stream))==NULL )
+		{
+			perror("fgets error");
+			return NULL;
+		}
+	return str;
+}
+
+int Fputs(const char *s, FILE *stream)
+{
+	int ret;
+	if( (ret = fputs(s, stream))==EOF )
+	{
+		perror("fgets error");
+		return -1;
+	}
+	return ret;
+}
 
 
