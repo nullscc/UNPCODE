@@ -2,16 +2,24 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
-
+#include <errno.h>
 
 void strecho(int fd)
 {
 	int n;
 	char buf[MAXLINE];
+again:
 	while( (n = read(fd, buf, MAXLINE)) > 0)
 	{	
-		write(fd, buf, strlen(buf)); 
+		Writen(fd, buf, strlen(buf)); 
 		bzero(buf, MAXLINE);
+	}
+	if (n < 0 && errno == EINTR)
+		goto again;
+	else if (n < 0)
+	{
+		perror("strecho: read error");
+		return ;
 	}
 
 }

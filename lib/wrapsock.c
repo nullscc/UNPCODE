@@ -65,9 +65,9 @@ int Accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 	again:
 	if ( (connfd = accept(sockfd, addr, addrlen)) < 0) {
 #ifdef	EPROTO
-		if (errno == EPROTO || errno == ECONNABORTED)
+		if (errno == EPROTO || errno == ECONNABORTED || errno == EINTR)
 #else
-		if (errno == ECONNABORTED)
+		if (errno == ECONNABORTED || errno == EINTR)
 #endif
 			goto again;
 		else
