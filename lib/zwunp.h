@@ -31,5 +31,7 @@ char *Fgets(char *s, int size, FILE *stream);
 
 int Fputs(const char *s, FILE *stream);
 
+ssize_t Readline(int fd, void *ptr, size_t maxlen);
+
 
 #endif

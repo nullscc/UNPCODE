@@ -13,10 +13,10 @@ void strcli(FILE* fp, int fd)
 	{
 		Writen(fd, buf, strlen(buf));
 
-		if(read(fd, echobuf, MAXLINE) == 0)
+		if(Readline(fd, echobuf, MAXLINE) == 0)
 		{
 			perror("read error:server terminted premature");
-			return -1;
+			return;
 		}
 		Fputs(echobuf, stdout);
 		//printf("%s", echobuf);
