@@ -3,7 +3,8 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <unistd.h>
-#include<signal.h>
+#include <signal.h>
+
 
 int Socket(int domain, int type, int protocol)
 {
@@ -232,4 +233,29 @@ Sigfunc *Signal(int signo, Sigfunc *func)	/* for our signal() function */
 	}
 	return(sigfunc);
 }
+
+ssize_t Read(int fd, void *ptr, size_t nbytes)
+{
+	ssize_t		n;
+
+	if ( (n = read(fd, ptr, nbytes)) == -1)
+	{
+		perror("read error");
+		return -1;
+	}
+	return(n);
+}
+
+
+int Select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout)
+{
+	int n;
+	if( (n = select(nfds, readfds, writefds, exceptfds, timeout)) < 0)
+	{
+		perror("select error");
+		return -1;
+	}
+	return n;
+}
+
 
