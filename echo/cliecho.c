@@ -41,8 +41,8 @@ void strcli_select(FILE* fp, int fd)
 					FD_CLR(fileno(fp), &sel_rdset);
 					continue;
 			}
-			
 			Writen(fd, buf, strlen(buf));
+			memset(buf, 0, MAXLINE);
 		}
 
 	}
