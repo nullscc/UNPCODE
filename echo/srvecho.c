@@ -3,6 +3,19 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+void sig_chld(int sig)
+{
+	pid_t pid;
+	while( (pid = waitpid(-1, NULL, WNOHANG)) > 0 )
+	{
+		;//printf("child:%d has terminted\n", pid);
+	}
+	
+	return;
+}
 
 void strecho(int fd)
 {
@@ -38,7 +51,7 @@ int main()
 	
 	Bind(listenfd, (SA *)&srvaddr, sizeof(srvaddr));
 	Listen(listenfd, 10);
-
+	Signal(SIGCHLD, sig_chld);	
 	while( (connfd = Accept(listenfd, NULL, NULL)) > 0 )
 	{
 		if(0 == fork())

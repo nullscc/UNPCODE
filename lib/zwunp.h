@@ -14,6 +14,7 @@
 
 //typedef struct sockaddr SA;  // why error
 #define SA struct sockaddr
+typedef void Sigfunc(int);
 
 int Socket(int domain, int type, int protocol);
 
@@ -33,5 +34,6 @@ int Fputs(const char *s, FILE *stream);
 
 ssize_t Readline(int fd, void *ptr, size_t maxlen);
 
+Sigfunc *Signal(int signo, Sigfunc *func);	/* for our signal() function */
 
 #endif
