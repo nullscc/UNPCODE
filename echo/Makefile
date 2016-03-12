@@ -1,6 +1,6 @@
 include ../config
 
-PROGS = cliecho srvecho
+PROGS = cliecho srvecho srvecho_select
 
 all:${PROGS}
 
@@ -9,6 +9,9 @@ cliecho:cliecho.o ../libzwunp.a
 
 srvecho:srvecho.o ../libzwunp.a
 	${CC} ${CFLAGS} -o $@ $^
-	
+
+srvecho_select:srvecho_select.o ../libzwunp.a
+	${CC} ${CFLAGS} -o $@ $^
+
 clean:
 	rm -f ${PROGS} *.o
