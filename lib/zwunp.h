@@ -24,6 +24,10 @@
 #define SA struct sockaddr
 typedef void Sigfunc(int);
 
+#ifndef INFTIM
+#define INFTIM          (-1)    /* infinite poll timeout */
+#endif
+
 #define	max(a,b)	((a) > (b) ? (a) : (b))
 
 int Socket(int domain, int type, int protocol);

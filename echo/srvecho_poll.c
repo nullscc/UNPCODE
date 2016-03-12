@@ -3,13 +3,14 @@
 #include <unistd.h>
 #include <stdlib.h>
 
+
 #define OPEN_MAX 256
 
 int main()
 {
 	int listenfd, connfd;
 	struct sockaddr_in srvaddr, cliaddr;
-	int maxi, nready, i, n, 
+	int maxi, nready, i, n;
 	struct pollfd clipolfd[OPEN_MAX];
 	char buf[4096];
 	
@@ -35,12 +36,6 @@ int main()
 
 	for(;;)
 	{
-		for(i=0; i<=maxi; i++)
-		{
-			if(clipolfd[i].fd != -1)
-				;//FD_SET(client[i], &srvrdset);
-		}
-		
 		nready = Poll(clipolfd, maxi+1, INFTIM);
 		for(i=0; i <= maxi; i++)
 		{
