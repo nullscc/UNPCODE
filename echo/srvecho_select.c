@@ -6,7 +6,7 @@
 int main()
 {
 	int listenfd, connfd;
-	struct sockaddr_in srvaddr;
+	struct sockaddr_in srvaddr, cliaddr;
 	int maxi, maxfd, nready, i, n, client[FD_SETSIZE];
 	fd_set srvrdset;
 	char buf[4096];
@@ -48,7 +48,10 @@ int main()
 			{
 				if(listenfd == client[i])
 				{
-					connfd = Accept(listenfd, NULL, NULL);
+					socklen_t len;
+					len = sizeof(cliaddr);
+					connfd = Accept(listenfd, (SA *)&cliaddr, &len);
+					printf("%s:%d connected\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
 					nready--;
 					if(connfd > maxfd)
 						maxfd= connfd;
