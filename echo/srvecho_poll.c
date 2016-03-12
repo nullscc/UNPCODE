@@ -43,7 +43,6 @@ int main()
 			{	
 				break;
 			}
-			
 			if( clipolfd[i].revents & (POLLRDNORM | POLLERR))
 			{
 				if(listenfd == clipolfd[i].fd)
@@ -59,7 +58,8 @@ int main()
 						{
 							if(i>maxi)
 								maxi=i;
-							clipolfd[i].fd = connfd;
+							clipolfd[i].fd     = connfd;
+							clipolfd[i].events = POLLRDNORM;
 							break;
 						}
 					}
