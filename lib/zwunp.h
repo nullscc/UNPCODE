@@ -14,6 +14,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <string.h>
+#include <poll.h>
+#include <sys/poll.h>
+
 
 #define	MAXLINE		4096	/* max text line length */
 
@@ -47,6 +50,7 @@ Sigfunc *Signal(int signo, Sigfunc *func);	/* for our signal() function */
 
 int Select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
 
+int Poll(struct pollfd *fds, nfds_t nfds, int timeout);
 
 
 #endif

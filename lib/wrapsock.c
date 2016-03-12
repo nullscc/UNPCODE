@@ -5,7 +5,6 @@
 #include <unistd.h>
 #include <signal.h>
 
-
 int Socket(int domain, int type, int protocol)
 {
 	int sockfd;
@@ -251,6 +250,17 @@ int Select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struc
 {
 	int n;
 	if( (n = select(nfds, readfds, writefds, exceptfds, timeout)) < 0)
+	{
+		perror("select error");
+		return -1;
+	}
+	return n;
+}
+
+int Poll(struct pollfd *fds, nfds_t nfds, int timeout)
+{
+	int n;
+	if( (n = poll(fds, nfds, timeout)) < 0)
 	{
 		perror("select error");
 		return -1;
