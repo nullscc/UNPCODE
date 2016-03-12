@@ -1,5 +1,7 @@
 #include <zwunp.h>
-
+#include <errno.h>
+#include <unistd.h>
+#include <stdlib.h>
 
 int main()
 {
@@ -65,12 +67,23 @@ int main()
 				else
 				{
 					nready--;
-					if( (n = Read(client[i], buf, 4096)) == 0 )
+					if( (n = Read(client[i], buf, 4096)) <= 0 )
 					{
-						FD_CLR(client[i], &srvrdset);
-						close(client[i]);
-						client[i] = -1;
-						continue;
+						if( (n < 0) && (errno == ECONNRESET) )
+						{
+							printf("client[%d] has aborted the connection\n", i);
+							continue;
+						}
+						else if(n < 0)
+							exit(1);
+						if(n == 0)
+						{
+							printf("client[%d] has terminted the connection\n", i);;
+							FD_CLR(client[i], &srvrdset);
+							close(client[i]);
+							client[i] = -1;
+							continue;
+						}
 					}
 					for(i=1; i<=maxi; i++)
 					{	
