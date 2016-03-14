@@ -30,6 +30,14 @@ typedef void Sigfunc(int);
 
 #define	max(a,b)	((a) > (b) ? (a) : (b))
 
+struct chat_info
+{
+	char UserName[25];
+	char UserPassed[20];
+	char RealTime[30];
+	char msg[MAXLINE];
+};
+
 int Socket(int domain, int type, int protocol);
 
 int Bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);

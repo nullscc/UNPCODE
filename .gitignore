@@ -7,3 +7,6 @@ cliecho
 srvecho
 srvecho_select
 srvecho_poll
+clichat
+srvchat
+*~
