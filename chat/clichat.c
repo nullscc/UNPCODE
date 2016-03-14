@@ -62,13 +62,30 @@ int main(int argc, char**argv)
 	int sockfd;
 	struct sockaddr_in srvaddr;
 	struct chat_info cli_info;
-		
+	char option;
 
 	if(argc != 2)
 	{
 		printf("Usage:%s <IPAdress>\n", argv[0]);
 		return -1;
 	}
+	printf("-------- Welcome Linux Terminal Chat Room --------\n");
+	printf("Please Select Option Below\n");
+	printf("--------------------\n");
+	printf("| 1:Register       |\n");
+	printf("| 2:Login          |\n");
+	printf("--------------------\n");
+	read(fileno(stdin), &option, 1);
+
+	if(option == '1')
+	{
+		printf("Please Input An User Name:");		
+	}
+	if(option == '2')
+	{
+		printf("Login\n");		
+	}
+
 	memset(&cli_info, 0, sizeof(struct chat_info));
 	memcpy(cli_info.UserName, "baby", 25);
 
