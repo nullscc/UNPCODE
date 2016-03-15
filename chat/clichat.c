@@ -21,11 +21,20 @@ int main(int argc, char**argv)
 
 	printf("-------- Welcome Linux Terminal Chat Room --------\n");
     printf("Please Select Option Below:\n");
+
+	sockfd = Socket(AF_INET, SOCK_STREAM, 0);
+
+	srvaddr.sin_family = AF_INET;
+	srvaddr.sin_port = htons(6677);
+	inet_aton(argv[1], &srvaddr.sin_addr);
+
+	Connect(sockfd, (SA*)&srvaddr, sizeof(srvaddr));
+
 FIRST_IN:
-	printf("--------------------\n");
-	printf("| 1:Register       |\n");
-	printf("| 2:Login          |\n");
-	printf("--------------------\n");
+    printf("--------------------\n");
+    printf("| 1:Register       |\n");
+    printf("| 2:Login          |\n");
+    printf("--------------------\n");
     //read(fileno(stdin), &option, 1);
     option = getc(stdin);
 
@@ -37,8 +46,8 @@ FIRST_IN:
         cli_info.UserName[n-1] = '\0'; //取消输入的'\n'
 
         printf_flush("Please Input A passwd:");
-        n = Read(fileno(stdin), cli_info.UserPassed, sizeof(cli_info.UserPassed));
-        cli_info.UserPassed[n-1] = '\0'; //取消输入的'\n'
+        n = Read(fileno(stdin), cli_info.UserPasswd, sizeof(cli_info.UserPasswd));
+        cli_info.UserPasswd[n-1] = '\0'; //取消输入的'\n'
     }
     else if(option == '2')
     {
@@ -52,13 +61,19 @@ FIRST_IN:
         clearbuf();
         goto FIRST_IN;
     }
-	sockfd = Socket(AF_INET, SOCK_STREAM, 0);
 
-	srvaddr.sin_family = AF_INET;
-	srvaddr.sin_port = htons(6677);
-	inet_aton(argv[1], &srvaddr.sin_addr);
+    if(cli_info.flag == REGISTER)
+    {
+        Writen(sockfd, &cli_info, sizeof(struct chat_info) - (MAXLINE-strlen(cli_info.msg)));
+        printf("Register Success,Please Select Option Below:\n");
+        clearbuf();
+        goto FIRST_IN;
+    }
+    else if(cli_info.flag == LOGIN)
+    {
 
-	Connect(sockfd, (SA*)&srvaddr, sizeof(srvaddr));
+    }
+
     clearbuf();
 	strcli_select(stdin, sockfd, &cli_info);
 

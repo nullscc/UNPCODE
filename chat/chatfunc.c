@@ -1,5 +1,28 @@
 #include <stdio.h>
 #include "chat.h"
+#include "zwunp.h"
+
+void reg_to_passwd_file(struct chat_info *info, char *filename)
+{
+    int passwd_fd;
+    char buf[100];
+    printf("excute reg_to_passwd_file\n");
+    passwd_fd = open(filename, O_CREAT|O_APPEND|O_RDWR);
+    if(passwd_fd < 0)
+    {
+        perror("open or create /etc/chat.passwd failed");
+        exit(1);
+    }
+    if(lseek(passwd_fd, 0, SEEK_END) < 0)
+    {
+        perror("lseek failed");
+        exit(1);
+    }
+    memset(buf, 0, sizeof(buf));
+    snprintf(buf, sizeof(info->UserName) + sizeof(info->UserPasswd) + 1, "%s:%s\n", info->UserName, info->UserPasswd);
+    Writen(passwd_fd, buf, strlen(buf));
+    close(passwd_fd);
+}
 
 void str_echo(int listenfd)
 {
@@ -69,7 +92,11 @@ void str_echo(int listenfd)
                             continue;
                         }
                     }
-
+                    printf("cli_info.name is %s\n", cli_info.UserName);
+                    if(cli_info.flag == REGISTER)
+                    {
+                        reg_to_passwd_file(&cli_info, "/etc/chat.passwd");
+                    }
                     for(i=1; i<=maxi; i++)
                     {
                         if(clipolfd[i].fd != -1)
@@ -133,6 +160,7 @@ void strcli_select(FILE* fp, int fd, struct chat_info *msginfo)
             }
             if( (buf[0] == '\n')  )
                 continue;
+
             memset(msginfo->msg, 0, MAXLINE);
             memcpy(msginfo->msg, buf, strlen(buf));
             Writen(fd, msginfo, sizeof(struct chat_info) - (MAXLINE-strlen(buf)));
@@ -144,4 +172,8 @@ void strcli_select(FILE* fp, int fd, struct chat_info *msginfo)
 
 }
 
+int file_exists(char *filename)
+{
+return (access(filename, 0) == 0);
+}
 
