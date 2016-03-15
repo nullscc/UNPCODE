@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <time.h>
+#include "chat.h"
 
 #define OPEN_MAX 256
 

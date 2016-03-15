@@ -1,8 +1,6 @@
 #ifndef ZW_UNP_H
 #define ZW_UNP_H
 
-
-
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -18,6 +16,7 @@
 #include <sys/poll.h>
 
 
+
 #define	MAXLINE		4096	/* max text line length */
 
 //typedef struct sockaddr SA;  // why error
@@ -29,14 +28,6 @@ typedef void Sigfunc(int);
 #endif
 
 #define	max(a,b)	((a) > (b) ? (a) : (b))
-
-struct chat_info
-{
-	char UserName[25];
-	char UserPassed[20];
-	char RealTime[30];
-	char msg[MAXLINE];
-};
 
 int Socket(int domain, int type, int protocol);
 

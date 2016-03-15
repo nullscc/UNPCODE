@@ -48,28 +48,7 @@ void strcli_select(FILE* fp, int fd)
 	}
 
 }
-/*
-void strcli(FILE* fp, int fd)
-{
-	char buf[MAXLINE];
-	char echobuf[MAXLINE];
-	
-	while( Fgets(buf, MAXLINE, fp) != NULL)
-	{
-		Writen(fd, buf, strlen(buf));
 
-		if(Readline(fd, echobuf, MAXLINE) == 0)
-		{
-			perror("read error:server terminted premature");
-			return;
-		}
-		Fputs(echobuf, stdout);
-		//printf("%s", echobuf);
-		memset(echobuf, 0, MAXLINE);
-		
-	}
-}
-*/
 
 int main(int argc, char**argv)
 {
