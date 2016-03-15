@@ -6,7 +6,7 @@ void reg_to_passwd_file(struct chat_info *info, char *filename)
 {
     int passwd_fd;
     char buf[100];
-    printf("excute reg_to_passwd_file\n");
+    DEBUG_LONG("excute reg_to_passwd_file\n");
     passwd_fd = open(filename, O_CREAT|O_APPEND|O_RDWR);
     if(passwd_fd < 0)
     {
@@ -24,10 +24,65 @@ void reg_to_passwd_file(struct chat_info *info, char *filename)
     close(passwd_fd);
 }
 
+void handle_login(struct chat_info *info, char *filename, int *login_flag, int fdindex, int sockfd)
+{
+    int passwd_fd;
+    char buf[100];
+    char bufname[50];
+    char bufpasswd[50];
+
+    DEBUG_LONG("excute handle_login\n");
+    passwd_fd = open(filename, O_RDONLY);
+    if(passwd_fd < 0)
+    {
+        perror("open or create /etc/chat.passwd failed");
+        exit(1);
+    }
+
+    memset(bufname, 0, sizeof(bufname));
+    memset(bufpasswd, 0, sizeof(bufpasswd));
+    memset(buf, 0, sizeof(buf));
+    while( Readline(passwd_fd, buf, sizeof(buf)) != 0 )
+    {
+        int i;
+        DEBUG("buf is %s\n", buf);
+        for(i=0; i<100; i++)
+        {
+            if(buf[i] == ':')
+            {
+                DEBUG("buf[%d] = :\n", i);
+                memcpy(bufname, buf, i);
+                memcpy(bufpasswd, &buf[i+1], sizeof(buf) - i - 1);
+
+                if( !strncmp(bufname, info->UserName, i) )
+                {
+                    if(!strncmp(bufpasswd, info->UserPasswd, strlen(bufpasswd) - i - 1))
+                    {
+                        DEBUG("login success\n");
+                        login_flag[fdindex] = TRUE;
+                        Writen(sockfd, "Y", 1);
+                    }
+                }
+                break;
+            }
+        }
+
+
+    }
+    if(!login_flag[fdindex])
+    {
+        Writen(sockfd, "N", 1);
+        DEBUG("login fail\n");
+    }
+    close(passwd_fd);
+}
+
+
 void str_echo(int listenfd)
 {
     int maxi, nready, i, n, connfd;
     struct pollfd clipolfd[OPEN_MAX];
+    int login_ok[OPEN_MAX];
     struct sockaddr_in cliaddr;
     struct chat_info cli_info;
     time_t ticks;
@@ -35,6 +90,7 @@ void str_echo(int listenfd)
     for(i=0; i<OPEN_MAX; i++)
     {
         clipolfd[i].fd = -1;
+        login_ok[i] = FALSE;
     }
 
     clipolfd[0].fd     = listenfd;
@@ -92,18 +148,21 @@ void str_echo(int listenfd)
                             continue;
                         }
                     }
-                    printf("cli_info.name is %s\n", cli_info.UserName);
+
                     if(cli_info.flag == REGISTER)
                     {
+                        printf("file:%s,line:%d\n", __FILE__, __LINE__);
                         reg_to_passwd_file(&cli_info, "/etc/chat.passwd");
                     }
                     else if(cli_info.flag == LOGIN)
                     {
+                        printf("file:%s,line:%d\n", __FILE__, __LINE__);
                         printf("login cli_info.name is %s\n", cli_info.UserName);
-                        //handle_login(&cli_info, "/etc/chat.passwd");
+                        handle_login(&cli_info, "/etc/chat.passwd", login_ok, i, clipolfd[i].fd);
                     }
                     else if(cli_info.flag == SENDMSG)
                     {
+                        printf("file:%s,line:%d\n", __FILE__, __LINE__);
                         for(i=1; i<=maxi; i++)
                         {
                             if(clipolfd[i].fd != -1)
@@ -149,7 +208,7 @@ void strcli_select(FILE* fp, int fd, struct chat_info *msginfo)
                 }
                 return;
             }
-
+            DEBUG("sockfd in %s has data\n", __FILE__);
             printf("%s\n", rcvinfo.RealTime);
             printf("%s:\n", rcvinfo.UserName);
             printf("%s\n", rcvinfo.msg);
@@ -171,6 +230,7 @@ void strcli_select(FILE* fp, int fd, struct chat_info *msginfo)
 
             memset(msginfo->msg, 0, MAXLINE);
             memcpy(msginfo->msg, buf, strlen(buf));
+            DEBUG("stdin in %s has data\n", __FILE__);
             Writen(fd, msginfo, sizeof(struct chat_info) - (MAXLINE-strlen(buf)));
             memset(buf, 0, MAXLINE);
             memset(msginfo->msg, 0, MAXLINE);

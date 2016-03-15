@@ -11,6 +11,7 @@ int main(int argc, char**argv)
 	struct chat_info cli_info;
 	char option;
     int n;
+    char loginresult;
 
 	if(argc != 2)
 	{
@@ -52,7 +53,6 @@ FIRST_IN:
     else if(option == '2')
     {
         cli_info.flag = LOGIN;
-        printf("Login\n");
     }
     else
     {
@@ -80,6 +80,12 @@ FIRST_IN:
         n = Read(fileno(stdin), cli_info.UserPasswd, sizeof(cli_info.UserPasswd));
         cli_info.UserPasswd[n-1] = '\0'; //取消输入的'\n'
         Writen(sockfd, &cli_info, sizeof(struct chat_info) - (MAXLINE-strlen(cli_info.msg)));
+        Read(sockfd, &loginresult, 1);
+        if(loginresult == 'Y')
+            DEBUG("login success\n");
+        if(loginresult == 'N')
+            DEBUG("login fail\n");
+        clearbuf();
     }
 
     cli_info.flag = SENDMSG;

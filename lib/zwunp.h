@@ -30,6 +30,7 @@
 
 #define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
 
+
 #define container_of(ptr, type, member) ({      \
     const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
     (type *)( (char *)__mptr - offsetof(type,member) );})
@@ -43,6 +44,9 @@ typedef void Sigfunc(int);
 #endif
 
 #define	max(a,b)	((a) > (b) ? (a) : (b))
+
+#define TRUE 1
+#define FALSE 0
 
 int Socket(int domain, int type, int protocol);
 
