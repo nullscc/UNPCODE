@@ -99,7 +99,7 @@ int main(int argc, char**argv)
 	inet_aton(argv[1], &srvaddr.sin_addr);
 
 	Connect(sockfd, (SA*)&srvaddr, sizeof(srvaddr));
-
+    clearbuf();
 	strcli_select(stdin, sockfd, &cli_info);
 
 

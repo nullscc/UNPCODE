@@ -156,4 +156,9 @@ int Poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	return n;
 }
 
+void clearbuf()
+{
+    char ch;
+    while( (ch=getchar())!='\n' && ch!=EOF);
+}
 
