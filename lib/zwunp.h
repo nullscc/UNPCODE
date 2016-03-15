@@ -57,4 +57,6 @@ int Poll(struct pollfd *fds, nfds_t nfds, int timeout);
 
 void clearbuf();
 
+void printf_flush(char * const str);
+
 #endif

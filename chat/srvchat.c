@@ -90,6 +90,7 @@ int main()
 							continue;
 						}
 					}
+
 					for(i=1; i<=maxi; i++)
 					{	
 						if(clipolfd[i].fd != -1)

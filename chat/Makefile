@@ -4,7 +4,7 @@ PROGS = clichat srvchat
 
 all:${PROGS}
 
-clichat:clichat.o ../libzwunp.a
+clichat:clichat.o chatfunc.o ../libzwunp.a
 	${CC} ${CFLAGS} -o $@ $^
 
 srvchat:srvchat.o ../libzwunp.a

@@ -162,3 +162,9 @@ void clearbuf()
     while( (ch=getchar())!='\n' && ch!=EOF);
 }
 
+void printf_flush(char * const str)
+{
+    printf("%s", str);
+    fflush(stdout); //加上fflush强制刷新缓冲区
+}
+
