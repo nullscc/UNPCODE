@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include "chat.h"
 
 void strcli_select(FILE* fp, int fd, struct chat_info *msginfo)
 {
@@ -75,11 +76,13 @@ int main(int argc, char**argv)
 	printf("| 1:Register       |\n");
 	printf("| 2:Login          |\n");
 	printf("--------------------\n");
-	read(fileno(stdin), &option, 1);
+    //read(fileno(stdin), &option, 1);
+    option = getc(stdin);
 
 	if(option == '1')
 	{
-		printf("Please Input An User Name:");		
+        printf("Please Input An User Name:");
+        fflush(stdout); //加上fflush强制刷新缓冲区
 	}
 	if(option == '2')
 	{
