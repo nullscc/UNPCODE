@@ -97,18 +97,26 @@ void str_echo(int listenfd)
                     {
                         reg_to_passwd_file(&cli_info, "/etc/chat.passwd");
                     }
-                    for(i=1; i<=maxi; i++)
+                    else if(cli_info.flag == LOGIN)
                     {
-                        if(clipolfd[i].fd != -1)
-                        {
-
-                            ticks = time(NULL);
-                            snprintf(cli_info.RealTime, sizeof(cli_info.RealTime), "%.24s", ctime(&ticks));
-                            //memcpy(cli_info.RealTime, ctime(time(NULL)), );
-                            Writen(clipolfd[i].fd, &cli_info, sizeof(struct chat_info) - (MAXLINE-strlen(cli_info.msg)));
-                        }
+                        printf("login cli_info.name is %s\n", cli_info.UserName);
+                        //handle_login(&cli_info, "/etc/chat.passwd");
                     }
-                    memset(&cli_info, 0, sizeof(struct chat_info));
+                    else if(cli_info.flag == SENDMSG)
+                    {
+                        for(i=1; i<=maxi; i++)
+                        {
+                            if(clipolfd[i].fd != -1)
+                            {
+
+                                ticks = time(NULL);
+                                snprintf(cli_info.RealTime, sizeof(cli_info.RealTime), "%.24s", ctime(&ticks));
+                                //memcpy(cli_info.RealTime, ctime(time(NULL)), );
+                                Writen(clipolfd[i].fd, &cli_info, sizeof(struct chat_info) - (MAXLINE-strlen(cli_info.msg)));
+                            }
+                        }
+                        memset(&cli_info, 0, sizeof(struct chat_info));
+                    }
 
                 }
             }

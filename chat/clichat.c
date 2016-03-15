@@ -65,15 +65,24 @@ FIRST_IN:
     if(cli_info.flag == REGISTER)
     {
         Writen(sockfd, &cli_info, sizeof(struct chat_info) - (MAXLINE-strlen(cli_info.msg)));
+        //需要处理同名的情况
         printf("Register Success,Please Select Option Below:\n");
         clearbuf();
         goto FIRST_IN;
     }
     else if(cli_info.flag == LOGIN)
     {
+        printf_flush("Your Name:");
+        n = Read(fileno(stdin), cli_info.UserName, sizeof(cli_info.UserName));
+        cli_info.UserName[n-1] = '\0'; //取消输入的'\n'
 
+        printf_flush("Your Passwd:");
+        n = Read(fileno(stdin), cli_info.UserPasswd, sizeof(cli_info.UserPasswd));
+        cli_info.UserPasswd[n-1] = '\0'; //取消输入的'\n'
+        Writen(sockfd, &cli_info, sizeof(struct chat_info) - (MAXLINE-strlen(cli_info.msg)));
     }
 
+    cli_info.flag = SENDMSG;
     clearbuf();
 	strcli_select(stdin, sockfd, &cli_info);
 
