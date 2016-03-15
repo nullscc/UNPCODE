@@ -17,6 +17,15 @@
 #include <errno.h>
 #include <stdlib.h>
 
+#define PRINTF_RED(msg, arg...) \
+    printf("\033[1;31m" "%s %s(%d) " msg "\033[m\n", __FILE__, __FUNCTION__, __LINE__ , ##arg)
+
+#define DEBUG_LONG(msg, arg...) \
+    printf( "%s %s(%d) " msg , __FILE__, __FUNCTION__, __LINE__ , ##arg)
+
+#define DEBUG(msg, arg...) \
+    printf( msg , ##arg)
+
 #define	MAXLINE		4096	/* max text line length */
 
 //typedef struct sockaddr SA;  // why error
