@@ -7,7 +7,7 @@ all:${PROGS}
 clichat:clichat.o chatfunc.o ../libzwunp.a
 	${CC} ${CFLAGS} -o $@ $^
 
-srvchat:srvchat.o ../libzwunp.a
+srvchat:srvchat.o chatfunc.o ../libzwunp.a
 	${CC} ${CFLAGS} -o $@ $^
 
 clean:

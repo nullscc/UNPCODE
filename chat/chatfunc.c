@@ -1,6 +1,93 @@
 #include <stdio.h>
 #include "chat.h"
-#include "zwunp.h"
+
+void str_echo(int listenfd)
+{
+    int maxi, nready, i, n, connfd;
+    struct pollfd clipolfd[OPEN_MAX];
+    struct sockaddr_in cliaddr;
+    struct chat_info cli_info;
+    time_t ticks;
+    memset(&cli_info, 0, sizeof(struct chat_info));
+    for(i=0; i<OPEN_MAX; i++)
+    {
+        clipolfd[i].fd = -1;
+    }
+
+    clipolfd[0].fd     = listenfd;
+    clipolfd[0].events = POLLRDNORM;
+
+    maxi = 0;
+    for(;;)
+    {
+        nready = Poll(clipolfd, maxi+1, INFTIM);
+        for(i=0; i <= maxi; i++)
+        {
+            if(nready == 0)
+            {
+                break;
+            }
+            if( clipolfd[i].revents & (POLLRDNORM | POLLERR))
+            {
+                if(listenfd == clipolfd[i].fd)
+                {
+                    socklen_t len;
+                    len = sizeof(cliaddr);
+                    connfd = Accept(listenfd, (SA *)&cliaddr, &len);
+                    printf("%s:%d connected\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+                    nready--;
+                    for(i=0; i<OPEN_MAX; i++)
+                    {
+                        if(clipolfd[i].fd == -1)
+                        {
+                            if(i>maxi)
+                                maxi=i;
+                            clipolfd[i].fd     = connfd;
+                            clipolfd[i].events = POLLRDNORM;
+                            break;
+                        }
+                    }
+
+                }
+                else
+                {
+                    nready--;
+                    if( (n = Read(clipolfd[i].fd, &cli_info, sizeof(struct chat_info))) <= 0 )
+                    {
+                        if( (n < 0) && (errno == ECONNRESET) )
+                        {
+                            printf("client[%d] has aborted the connection\n", i);
+                            continue;
+                        }
+                        else if(n < 0)
+                            exit(1);
+                        if(n == 0)
+                        {
+                            printf("client[%d] has terminted the connection\n", i);
+                            close(clipolfd[i].fd);
+                            clipolfd[i].fd = -1;
+                            continue;
+                        }
+                    }
+
+                    for(i=1; i<=maxi; i++)
+                    {
+                        if(clipolfd[i].fd != -1)
+                        {
+
+                            ticks = time(NULL);
+                            snprintf(cli_info.RealTime, sizeof(cli_info.RealTime), "%.24s", ctime(&ticks));
+                            //memcpy(cli_info.RealTime, ctime(time(NULL)), );
+                            Writen(clipolfd[i].fd, &cli_info, sizeof(struct chat_info) - (MAXLINE-strlen(cli_info.msg)));
+                        }
+                    }
+                    memset(&cli_info, 0, sizeof(struct chat_info));
+
+                }
+            }
+        }
+    }
+}
 
 void strcli_select(FILE* fp, int fd, struct chat_info *msginfo)
 {
@@ -27,6 +114,7 @@ void strcli_select(FILE* fp, int fd, struct chat_info *msginfo)
                 }
                 return;
             }
+
             printf("%s\n", rcvinfo.RealTime);
             printf("%s:\n", rcvinfo.UserName);
             printf("%s\n", rcvinfo.msg);
@@ -55,3 +143,5 @@ void strcli_select(FILE* fp, int fd, struct chat_info *msginfo)
     }
 
 }
+
+
