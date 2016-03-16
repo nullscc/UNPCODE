@@ -201,7 +201,10 @@ void str_echo(int listenfd)
                 {
                     handle_login(&cli_info, "/etc/chat.passwd", login_ok, i, cliselfd[i]);
                     if(login_ok[i])
+                    {
                         memcpy(cli_record[i].cliname, cli_info.UserName, sizeof(cli_info.UserName));
+                        printf("User:%s IP:%s:%d Login\n", cli_record[i].cliname, inet_ntoa(cli_record[i].cliaddr.sin_addr), ntohs(cli_record[i].cliaddr.sin_port));
+                    }
                 }
                 else if(cli_info.flag == SENDMSG)
                 {
