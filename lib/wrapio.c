@@ -159,7 +159,7 @@ int Poll(struct pollfd *fds, nfds_t nfds, int timeout)
 void clearbuf()
 {
 #if 1
-    fflush(stdout); //不推荐，有些编译器中fflush对stdin的行为未定义这里我暂时偷懒下，使用自定义的缓冲区可能会比较好
+    fflush(stdin); //不推荐，有些编译器中fflush对stdin的行为未定义这里我暂时偷懒下，使用自定义的缓冲区可能会比较好
 #else
     char ch;
 

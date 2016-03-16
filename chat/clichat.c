@@ -96,10 +96,7 @@ FIRST_IN:
     cli_info.flag = SENDMSG;
     PRINTF_DESTINATION();
     clearbuf();
-    n = Read(sockfd, loginresult, 10);
-    DEBUG("client read %d byte from srv\n", n);
-    DEBUG("read is %c\n", loginresult[0]);
-    DEBUG("next is strcli_select\n");
+
 	strcli_select(stdin, sockfd, &cli_info);
 
 
