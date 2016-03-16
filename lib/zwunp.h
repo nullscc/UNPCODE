@@ -27,7 +27,7 @@
     printf( "%s %s(%d) " msg , __FILE__, __FUNCTION__, __LINE__ , ##arg)
 
 #define DEBUG(msg, arg...) \
-    printf( msg , ##arg)
+    //printf( msg , ##arg)
 
 #define	MAXLINE		4096	/* max text line length */
 

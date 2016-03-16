@@ -54,7 +54,8 @@ void handle_login(struct chat_info *info, char *filename, int *login_flag, int f
                 DEBUG("buf[%d] = :\n", i);
                 memcpy(bufname, buf, i);
                 memcpy(bufpasswd, &buf[i+1], sizeof(buf) - i - 1);
-
+                DEBUG("bufname is :%s\n", bufname);
+                DEBUG("info->UserName is :%s\n", info->UserName);
                 if( !strncmp(bufname, info->UserName, i) )
                 {
                     if(!strncmp(bufpasswd, info->UserPasswd, strlen(bufpasswd) - i - 1))
@@ -88,105 +89,114 @@ void handle_login(struct chat_info *info, char *filename, int *login_flag, int f
 
 void str_echo(int listenfd)
 {
-    int maxi, nready, i, n, connfd;
-    struct pollfd clipolfd[OPEN_MAX];
-    int login_ok[OPEN_MAX];
+    int maxi, maxfd, nready, i, n, connfd;
+    int cliselfd[FD_SETSIZE];
+    fd_set rdset;
+    int login_ok[FD_SETSIZE];
     struct sockaddr_in cliaddr;
     struct chat_info cli_info;
     time_t ticks;
     memset(&cli_info, 0, sizeof(struct chat_info));
-    for(i=0; i<OPEN_MAX; i++)
+    for(i=0; i<FD_SETSIZE; i++)
     {
-        clipolfd[i].fd = -1;
+        cliselfd[i] = -1;
         login_ok[i] = FALSE;
     }
-
-    clipolfd[0].fd     = listenfd;
-    clipolfd[0].events = POLLRDNORM;
-
+    cliselfd[0] = listenfd;
+    maxfd = listenfd;
     maxi = 0;
+    FD_ZERO(&rdset);
     for(;;)
     {
-        nready = Poll(clipolfd, maxi+1, INFTIM);
+        for(i=0; i<=maxi; i++)
+        {
+            if( (cliselfd[i] != -1) )
+            {
+                DEBUG("i=%d\n", i);
+                FD_SET(cliselfd[i], &rdset);
+            }
+        }
+        nready = Select(maxfd+1, &rdset, NULL, NULL, NULL);
         for(i=0; i <= maxi; i++)
         {
             if(nready == 0)
             {
                 break;
             }
-            if( clipolfd[i].revents & (POLLRDNORM | POLLERR))
+
+            if(FD_ISSET(cliselfd[0], &rdset))
             {
-                if(listenfd == clipolfd[i].fd)
+                socklen_t len;
+                len = sizeof(cliaddr);
+                connfd = Accept(listenfd, (SA *)&cliaddr, &len);
+                printf("%s:%d connected\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+                nready--;
+                if(connfd > maxfd)
+                    maxfd = connfd;
+                for(i=0; i<FD_SETSIZE; i++)
                 {
-                    socklen_t len;
-                    len = sizeof(cliaddr);
-                    connfd = Accept(listenfd, (SA *)&cliaddr, &len);
-                    printf("%s:%d connected\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
-                    nready--;
-                    for(i=0; i<OPEN_MAX; i++)
+                    if(cliselfd[i] == -1)
                     {
-                        if(clipolfd[i].fd == -1)
-                        {
-                            if(i>maxi)
-                                maxi=i;
-                            clipolfd[i].fd     = connfd;
-                            clipolfd[i].events = POLLRDNORM;
-                            break;
-                        }
+                        if(i>maxi)
+                            maxi=i;
+                        cliselfd[i] = connfd;
+                        break;
                     }
-
                 }
-                else
-                {
-                    nready--;
-                    if( (n = Read(clipolfd[i].fd, &cli_info, sizeof(struct chat_info))) <= 0 )
-                    {
-                        if( (n < 0) && (errno == ECONNRESET) )
-                        {
-                            printf("client[%d] has aborted the connection\n", i);
-                            continue;
-                        }
-                        else if(n < 0)
-                            exit(1);
-                        if(n == 0)
-                        {
-                            printf("client[%d] has terminted the connection\n", i);
-                            close(clipolfd[i].fd);
-                            clipolfd[i].fd = -1;
-                            continue;
-                        }
-                    }
 
-                    if(cli_info.flag == REGISTER)
-                    {
-                        printf("file:%s,line:%d\n", __FILE__, __LINE__);
-                        reg_to_passwd_file(&cli_info, "/etc/chat.passwd");
-                    }
-                    else if(cli_info.flag == LOGIN)
-                    {
-                        printf("file:%s,line:%d\n", __FILE__, __LINE__);
-                        printf("login cli_info.name is %s\n", cli_info.UserName);
-                        handle_login(&cli_info, "/etc/chat.passwd", login_ok, i, clipolfd[i].fd);
-                    }
-                    else if(cli_info.flag == SENDMSG)
-                    {
-                        printf("file:%s,line:%d\n", __FILE__, __LINE__);
-                        for(i=1; i<=maxi; i++)
-                        {
-                            if(clipolfd[i].fd != -1)
-                            {
-
-                                ticks = time(NULL);
-                                snprintf(cli_info.RealTime, sizeof(cli_info.RealTime), "%.24s", ctime(&ticks));
-                                //memcpy(cli_info.RealTime, ctime(time(NULL)), );
-                                Writen(clipolfd[i].fd, &cli_info, sizeof(struct chat_info) - (MAXLINE-strlen(cli_info.msg)));
-                            }
-                        }
-                        memset(&cli_info, 0, sizeof(struct chat_info));
-                    }
-
-                }
             }
+            if(FD_ISSET(cliselfd[i], &rdset))
+            {
+                nready--;
+                if( (n = Read(cliselfd[i], &cli_info, sizeof(struct chat_info))) <= 0 )
+                {
+                    if( (n < 0) && (errno == ECONNRESET) )
+                    {
+                        printf("client[%d] has aborted the connection\n", i);
+                        continue;
+                    }
+                    else if(n < 0)
+                        exit(1);
+                    if(n == 0)
+                    {
+                        printf("client[%d] has terminted the connection\n", i);
+                        FD_CLR(cliselfd[i], &rdset);
+                        close(cliselfd[i]);
+                        cliselfd[i] = -1;
+                        continue;
+                    }
+                }
+
+                if(cli_info.flag == REGISTER)
+                {
+                    printf("file:%s,line:%d\n", __FILE__, __LINE__);
+                    reg_to_passwd_file(&cli_info, "/etc/chat.passwd");
+                }
+                else if(cli_info.flag == LOGIN)
+                {
+                    printf("file:%s,line:%d\n", __FILE__, __LINE__);
+                    printf("login cli_info.name is %s\n", cli_info.UserName);
+                    handle_login(&cli_info, "/etc/chat.passwd", login_ok, i, cliselfd[i]);
+                }
+                else if(cli_info.flag == SENDMSG)
+                {
+                    printf("file:%s,line:%d\n", __FILE__, __LINE__);
+                    for(i=1; i<=maxi; i++)
+                    {
+                        if(cliselfd[i] != -1)
+                        {
+
+                            ticks = time(NULL);
+                            snprintf(cli_info.RealTime, sizeof(cli_info.RealTime), "%.24s", ctime(&ticks));
+                            //memcpy(cli_info.RealTime, ctime(time(NULL)), );
+                            Writen(cliselfd[i], &cli_info, sizeof(struct chat_info) - (MAXLINE-strlen(cli_info.msg)));
+                        }
+                    }
+                    memset(&cli_info, 0, sizeof(struct chat_info));
+                }
+
+                }
+
         }
     }
 }

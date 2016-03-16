@@ -91,9 +91,7 @@ FIRST_IN:
         clearbuf(1);
         DEBUG("previous is clearbuf\n");
     }
-    PRINTF_DESTINATION();
     cli_info.flag = SENDMSG;
-    PRINTF_DESTINATION();
     clearbuf(1);
 
 	strcli_select(stdin, sockfd, &cli_info);
