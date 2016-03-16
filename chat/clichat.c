@@ -11,7 +11,7 @@ int main(int argc, char**argv)
 	struct chat_info cli_info;
 	char option;
     int n;
-    char loginresult[10];
+    char result[10];
 
 	if(argc != 2)
 	{
@@ -63,11 +63,29 @@ FIRST_IN:
 
     if(cli_info.flag == REGISTER)
     {
+        PRINTF_DESTINATION();
         Writen(sockfd, &cli_info, sizeof(struct chat_info) - (MAXLINE-strlen(cli_info.msg)));
+        PRINTF_DESTINATION();
         //需要处理同名的情况
-        printf("Register Success,Please Select Option Below:\n");
-        clearbuf(0);
-        goto FIRST_IN;
+        n = Read(sockfd, result, 10);
+        PRINTF_DESTINATION();
+        clearbuf(1);
+        PRINTF_DESTINATION();
+        printf("n:%d, result:%s\n", n, result);
+        if(result[0] == 'M')
+        {
+            printf("The User Name Has Already Be Register,Please Select Anothe Name:\n");
+            clearbuf(0);
+            goto FIRST_IN;
+        }
+        if(result[0] != 'Y')
+        {
+            printf("Register Success,Please Select Option Below:\n");
+            clearbuf(0);
+            goto FIRST_IN;
+        }
+
+
     }
     else if(cli_info.flag == LOGIN)
     {
@@ -76,19 +94,25 @@ FIRST_IN:
         cli_info.UserName[n-1] = '\0'; //取消输入的'\n'
 
         printf_flush("Your Passwd:");
+        DEBUG_LONG("Read from input n=%d\n", n);
         n = Read(fileno(stdin), cli_info.UserPasswd, sizeof(cli_info.UserPasswd));
+        DEBUG_LONG("Read from input n=%d\n", n);
         cli_info.UserPasswd[n-1] = '\0'; //取消输入的'\n'
         n = Writen(sockfd, &cli_info, sizeof(struct chat_info) - (MAXLINE-strlen(cli_info.msg)));
-        printf("client write %d byte to srv\n", n);
-        n = Read(sockfd, loginresult, 10);
-        printf("client read %d byte from srv\n", n);
+        DEBUG_LONG("writen to srv n=%d\n", n);
+        n = Read(sockfd, result, 10);
+        DEBUG_LONG("Read from srv n=%d\n", n);
         clearbuf(1);
 
-        if(loginresult[0] != 'Y')
+        if(result[0] != 'Y')
         {
             printf("User Name or Passwd Incorrect,Please Retry Below:\n");
             clearbuf(0);
             goto FIRST_IN;
+        }
+        if(result[0] == 'Y')
+        {
+            printf("Login Success,You Could Send Message To You Want!\n");
         }
 
     }

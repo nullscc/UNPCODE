@@ -2,10 +2,12 @@
 #include "chat.h"
 #include "zwunp.h"
 
-void reg_to_passwd_file(struct chat_info *info, char *filename)
+void reg_to_passwd_file(struct chat_info *info, char *filename, int sockfd)
 {
     int passwd_fd;
     char buf[100];
+    char bufname[50];
+    char registerresult;
     DEBUG_LONG("excute reg_to_passwd_file\n");
     passwd_fd = open(filename, O_CREAT|O_APPEND|O_RDWR);
     if(passwd_fd < 0)
@@ -13,6 +15,31 @@ void reg_to_passwd_file(struct chat_info *info, char *filename)
         perror("open or create /etc/chat.passwd failed");
         exit(1);
     }
+
+    while( Readline(passwd_fd, buf, sizeof(buf)) != 0 )
+    {
+        int i;
+        DEBUG("buf is %s\n", buf);
+        for(i=0; i<100; i++)
+        {
+            if(buf[i] == ':')
+            {
+                DEBUG("buf[%d] = :\n", i);
+                memcpy(bufname, buf, i);
+                DEBUG("bufname is :%s\n", bufname);
+                DEBUG("info->UserName is :%s\n", info->UserName);
+                if( !strncmp(bufname, info->UserName, i) )
+                {
+                    registerresult = 'M';
+                    Writen(sockfd, &registerresult, 1);
+                    close(passwd_fd);
+                    return;
+                }
+                break;
+            }
+        }
+    }
+    PRINTF_DESTINATION();
     if(lseek(passwd_fd, 0, SEEK_END) < 0)
     {
         perror("lseek failed");
@@ -21,6 +48,8 @@ void reg_to_passwd_file(struct chat_info *info, char *filename)
     memset(buf, 0, sizeof(buf));
     snprintf(buf, sizeof(info->UserName) + sizeof(info->UserPasswd) + 1, "%s:%s\n", info->UserName, info->UserPasswd);
     Writen(passwd_fd, buf, strlen(buf));
+    registerresult = 'Y';
+    Writen(sockfd, &registerresult, 1);
     close(passwd_fd);
 }
 
@@ -169,7 +198,7 @@ void str_echo(int listenfd)
                 if(cli_info.flag == REGISTER)
                 {
                     printf("file:%s,line:%d\n", __FILE__, __LINE__);
-                    reg_to_passwd_file(&cli_info, "/etc/chat.passwd");
+                    reg_to_passwd_file(&cli_info, "/etc/chat.passwd", cliselfd[i]);
                 }
                 else if(cli_info.flag == LOGIN)
                 {
@@ -261,6 +290,6 @@ void strcli_select(FILE* fp, int fd, struct chat_info *msginfo)
 
 int file_exists(char *filename)
 {
-return (access(filename, 0) == 0);
+    return (access(filename, 0) == 0);
 }
 
