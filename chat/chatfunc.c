@@ -120,7 +120,7 @@ void str_echo(int listenfd)
     int cliselfd[FD_SETSIZE];
     fd_set rdset;
     int login_ok[FD_SETSIZE];
-    struct sockaddr_in cliaddr;
+    struct user_info cli_record[FD_SETSIZE];
     struct chat_info cli_info;
     time_t ticks;
     memset(&cli_info, 0, sizeof(struct chat_info));
@@ -153,22 +153,22 @@ void str_echo(int listenfd)
             if(FD_ISSET(cliselfd[0], &rdset))
             {
                 socklen_t len;
-                len = sizeof(cliaddr);
-                connfd = Accept(listenfd, (SA *)&cliaddr, &len);
-                printf("%s:%d connected\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
-                nready--;
-                if(connfd > maxfd)
-                    maxfd = connfd;
+                len = sizeof(struct sockaddr_in);
                 for(i=0; i<FD_SETSIZE; i++)
                 {
                     if(cliselfd[i] == -1)
                     {
                         if(i>maxi)
                             maxi=i;
-                        cliselfd[i] = connfd;
                         break;
                     }
                 }
+                connfd = Accept(listenfd, (SA *)&cli_record[i].cliaddr, &len);
+                printf("%s:%d connected\n", inet_ntoa(cli_record[i].cliaddr.sin_addr), ntohs(cli_record[i].cliaddr.sin_port));
+                nready--;
+                if(connfd > maxfd)
+                    maxfd = connfd;
+                cliselfd[i] = connfd;
 
             }
             if(FD_ISSET(cliselfd[i], &rdset))
@@ -178,14 +178,14 @@ void str_echo(int listenfd)
                 {
                     if( (n < 0) && (errno == ECONNRESET) )
                     {
-                        printf("clien[%d] has aborted the connection\n", i);
+                        printf("User:%s IP:%s:%d has aborted the connection\n", cli_record[i].cliname, inet_ntoa(cli_record[i].cliaddr.sin_addr), ntohs(cli_record[i].cliaddr.sin_port));
                         continue;
                     }
                     else if(n < 0)
                         exit(1);
                     if(n == 0)
                     {
-                        printf("clien[%d] has terminted the connection\n", i);
+                        printf("User:%s IP:%s:%d has terminted the connection\n", cli_record[i].cliname, inet_ntoa(cli_record[i].cliaddr.sin_addr), ntohs(cli_record[i].cliaddr.sin_port));
                         FD_CLR(cliselfd[i], &rdset);
                         close(cliselfd[i]);
                         cliselfd[i] = -1;
@@ -200,6 +200,8 @@ void str_echo(int listenfd)
                 else if(cli_info.flag == LOGIN)
                 {
                     handle_login(&cli_info, "/etc/chat.passwd", login_ok, i, cliselfd[i]);
+                    if(login_ok[i])
+                        memcpy(cli_record[i].cliname, cli_info.UserName, sizeof(cli_info.UserName));
                 }
                 else if(cli_info.flag == SENDMSG)
                 {

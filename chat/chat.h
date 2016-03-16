@@ -27,6 +27,12 @@ struct chat_info
 	char msg[MAXLINE];
 };
 
+struct user_info
+{
+    struct sockaddr_in cliaddr;
+    char cliname[25];
+};
+
 void strcli_select(FILE* fp, int fd, struct chat_info *msginfo);
 
 void str_echo(int listenfd);
