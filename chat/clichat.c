@@ -58,7 +58,7 @@ FIRST_IN:
     {
         cli_info.flag = NONEOPTION;
         printf("Wrong Option,Please Select Option Below:\n");
-        clearbuf();
+        clearbuf(0);
         goto FIRST_IN;
     }
 
@@ -67,7 +67,7 @@ FIRST_IN:
         Writen(sockfd, &cli_info, sizeof(struct chat_info) - (MAXLINE-strlen(cli_info.msg)));
         //需要处理同名的情况
         printf("Register Success,Please Select Option Below:\n");
-        clearbuf();
+        clearbuf(0);
         goto FIRST_IN;
     }
     else if(cli_info.flag == LOGIN)
@@ -89,13 +89,13 @@ FIRST_IN:
         if(loginresult[0] == 'N')
             DEBUG("login fail\n");
         DEBUG("next is clearbuf\n");
-        clearbuf();
+        clearbuf(1);
         DEBUG("previous is clearbuf\n");
     }
     PRINTF_DESTINATION();
     cli_info.flag = SENDMSG;
     PRINTF_DESTINATION();
-    clearbuf();
+    clearbuf(1);
 
 	strcli_select(stdin, sockfd, &cli_info);
 

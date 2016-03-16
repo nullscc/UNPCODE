@@ -77,7 +77,7 @@ int Select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struc
 
 int Poll(struct pollfd *fds, nfds_t nfds, int timeout);
 
-void clearbuf();
+void clearbuf(int flag);
 
 void printf_flush(char * const str);
 

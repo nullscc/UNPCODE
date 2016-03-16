@@ -156,16 +156,15 @@ int Poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	return n;
 }
 
-void clearbuf()
+void clearbuf(int flag)
 {
-#if 1
-    fflush(stdin); //不推荐，有些编译器中fflush对stdin的行为未定义这里我暂时偷懒下，使用自定义的缓冲区可能会比较好
-#else
-    char ch;
-
-    while( (ch=getchar())!='\n' && ch!=EOF)
-        printf("ch:%c\n", ch);
-#endif
+    if(flag)
+        fflush(stdin); //不推荐，有些编译器中fflush对stdin的行为未定义这里我暂时偷懒下，使用自定义的缓冲区可能会比较好
+    else
+    {
+        char ch;
+        while( (ch=getchar())!='\n' && ch!=EOF); //这种办法会阻塞
+    }
 }
 
 void printf_flush(char * const str)
