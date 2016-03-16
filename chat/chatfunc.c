@@ -114,6 +114,44 @@ void handle_login(struct chat_info *info, char *filename, int *login_flag, int f
 }
 
 
+void write_online_num_to_cli(int fd, int *login_ok, int maxi)
+{
+    int i;
+    char buf[10];
+    int num_ret;
+    num_ret = 0;
+    for(i=0; i<=maxi; i++)
+    {
+        if(login_ok)
+            num_ret++;
+    }
+    snprintf(buf, 10, "%d", num_ret);
+    Writen(fd, buf, strlen(buf));
+}
+
+void write_online_name_to_cli(int *login_ok, struct user_info *info, int maxi, int fd)
+{
+    int i;
+    for(i=0; i<=maxi; i++)
+    {
+        if(login_ok)
+            Writen(fd, info->cliname, sizeof(info->cliname));
+    }
+}
+
+void srv_handle_cmd(int fd, struct chat_info *info, int *login_ok, int maxi)
+{
+    DEBUG("cmd is:%s\n", info->cmd);
+    char unsupport[] = "unsupport instuction";
+    if( !strncmp(info->cmd, "onlinenum", 9) )
+    {
+        write_online_num_to_cli(fd, login_ok, maxi);
+    }
+    else
+        Writen(fd, unsupport, sizeof(unsupport));
+
+}
+
 void str_echo(int listenfd)
 {
     int maxi, maxfd, nready, i, n, connfd;
@@ -206,6 +244,11 @@ void str_echo(int listenfd)
                         printf("User:%s IP:%s:%d Login\n", cli_record[i].cliname, inet_ntoa(cli_record[i].cliaddr.sin_addr), ntohs(cli_record[i].cliaddr.sin_port));
                     }
                 }
+                else if(cli_info.flag == COMMAND)
+                {
+                    srv_handle_cmd(cliselfd[i], &cli_info, login_ok, maxi);
+                    memset(&cli_info, 0, sizeof(struct chat_info));
+                }
                 else if(cli_info.flag == SENDMSG)
                 {
                     for(i=1; i<=maxi; i++)
@@ -228,12 +271,34 @@ void str_echo(int listenfd)
     }
 }
 
+void send_cmd_to_srv(int fd, struct chat_info *msginfo)
+{
+    Writen(fd, msginfo, sizeof(struct chat_info));
+}
+
+void recieve_cmd_result_from_srv(int fd, struct chat_info *msginfo)
+{
+    char buf[30];
+    memset(buf, 0, sizeof(buf));
+
+    if( !strncmp(msginfo->cmd, "onlinenum", 9) )
+    {
+        Read(fd, buf, sizeof(buf));
+        printf(YELLOW"online people:%s\n"COLOR_NONE, buf);
+    }
+    else
+    {
+        Read(fd, buf, sizeof(buf));
+        printf(LIGHT_RED"%s\n"COLOR_NONE, buf);
+    }
+}
+
 void strcli_select(FILE* fp, int fd, struct chat_info *msginfo)
 {
     char buf[MAXLINE];
     struct chat_info rcvinfo;
     fd_set sel_rdset;
-    int maxfd;
+    int maxfd, n;
     int stdineof = 0;
 
     FD_ZERO(&sel_rdset);
@@ -265,16 +330,30 @@ void strcli_select(FILE* fp, int fd, struct chat_info *msginfo)
         }
         if(FD_ISSET(fileno(fp), &sel_rdset))
         {
-            if( Read(fileno(fp), buf, MAXLINE) == 0)
+            if( (n = Read(fileno(fp), buf, MAXLINE)) == 0)
             {
                     stdineof = 1;
                     shutdown(fd, SHUT_WR);
                     FD_CLR(fileno(fp), &sel_rdset);
                     continue;
             }
+
             if( (buf[0] == '\n')  )
                 continue;
-
+            if(buf[0] == ':')
+            {
+                msginfo->flag = COMMAND;
+                memcpy(msginfo->cmd, &buf[1], strlen(&buf[1]));
+                send_cmd_to_srv(fd, msginfo);
+                recieve_cmd_result_from_srv(fd, msginfo);
+                memset(buf, 0, MAXLINE);
+                memset(msginfo->cmd, 0, sizeof(msginfo->cmd));
+                continue;
+            }
+            else
+            {
+                msginfo->flag = SENDMSG;
+            }
             memset(msginfo->msg, 0, MAXLINE);
             memcpy(msginfo->msg, buf, strlen(buf));
             DEBUG("stdin in %s has data\n", __FILE__);

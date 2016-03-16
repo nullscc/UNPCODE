@@ -31,9 +31,11 @@ enum Option
     NONEOPTION,
     REGISTER,
     LOGIN,
+    COMMAND,
     SENDMSG,
     MAXOPTION
 };
+
 
 struct chat_info
 {
@@ -41,6 +43,7 @@ struct chat_info
     char UserPasswd[20];
 	char RealTime[30];
     enum Option flag;
+    char cmd[20];
 	char msg[MAXLINE];
 };
 
