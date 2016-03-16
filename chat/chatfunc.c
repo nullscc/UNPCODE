@@ -251,14 +251,14 @@ void strcli_select(FILE* fp, int fd, struct chat_info *msginfo)
             {
                 if(stdineof == 0)
                 {
-                    printf("server terminted prematurely\n");
+                    printf(LIGHT_RED"server terminted prematurely\n"COLOR_NONE);
                 }
                 return;
             }
             DEBUG("sockfd in %s %d has data\n", __FILE__, __LINE__);
-            printf("%s\n", rcvinfo.RealTime);
-            printf("%s:\n", rcvinfo.UserName);
-            printf("%s\n", rcvinfo.msg);
+            printf(BROWN"%s\n"COLOR_NONE, rcvinfo.RealTime);
+            printf(LIGHT_PURPLE"%s:\n"COLOR_NONE, rcvinfo.UserName);
+            printf(LIGHT_CYAN"%s\n"COLOR_NONE, rcvinfo.msg);
 
             memset(&rcvinfo, 0, sizeof(struct chat_info));
 

@@ -28,24 +28,24 @@ int main(int argc, char**argv)
 
     Connect(sockfd, (SA*)&srvaddr, sizeof(srvaddr));
 
-    printf("-------- Welcome Linux Terminal Chat Room --------\n");
-    printf("Please Select Option Below:\n");
+    printf(LIGHT_PURPLE"-------- Welcome Linux Terminal Chat Room --------\n"COLOR_NONE);
+    printf(LIGHT_CYAN"Please Select Option Below:\n"COLOR_NONE);
 FIRST_IN:
-    printf("--------------------\n");
-    printf("| 1:Register       |\n");
-    printf("| 2:Login          |\n");
-    printf("--------------------\n");
+    printf(LIGHT_CYAN"--------------------\n"COLOR_NONE);
+    printf(LIGHT_CYAN"| 1:Register       |\n"COLOR_NONE);
+    printf(LIGHT_CYAN"| 2:Login          |\n"COLOR_NONE);
+    printf(LIGHT_CYAN"--------------------\n"COLOR_NONE);
     //read(fileno(stdin), &option, 1);
     option = getc(stdin);
 
     if(option == '1')
     {
         cli_info.flag = REGISTER;
-        printf_flush("Please Input An User Name:");
+        printf_flush(LIGHT_CYAN"Please Input An User Name:"COLOR_NONE);
         n = Read(fileno(stdin), cli_info.UserName, sizeof(cli_info.UserName));
         cli_info.UserName[n-1] = '\0'; //取消输入的'\n'
 
-        printf_flush("Please Input A passwd:");
+        printf_flush(LIGHT_CYAN"Please Input A passwd:"COLOR_NONE);
         n = Read(fileno(stdin), cli_info.UserPasswd, sizeof(cli_info.UserPasswd));
         cli_info.UserPasswd[n-1] = '\0'; //取消输入的'\n'
     }
@@ -56,7 +56,7 @@ FIRST_IN:
     else
     {
         cli_info.flag = NONEOPTION;
-        printf("Wrong Option,Please Select Option Below:\n");
+        printf(LIGHT_RED"Wrong Option,Please Select Option Below:\n"COLOR_NONE);
         clearbuf(0);
         goto FIRST_IN;
     }
@@ -71,16 +71,15 @@ FIRST_IN:
         PRINTF_DESTINATION();
         clearbuf(1);
         PRINTF_DESTINATION();
-        printf("n:%d, result:%s\n", n, result);
         if(result[0] == 'M')
         {
-            printf("The User Name Has Already Be Register,Please Select Anothe Name:\n");
+            printf(LIGHT_RED"The User Name Has Already Be Register,Please Select Anothe Name:\n"COLOR_NONE);
             clearbuf(0);
             goto FIRST_IN;
         }
         if(result[0] != 'Y')
         {
-            printf("Register Success,Please Select Option Below:\n");
+            printf(LIGHT_RED"Register Success,Please Select Option Below:\n"COLOR_NONE);
             clearbuf(0);
             goto FIRST_IN;
         }
@@ -89,11 +88,11 @@ FIRST_IN:
     }
     else if(cli_info.flag == LOGIN)
     {
-        printf_flush("Your Name:");
+        printf_flush(LIGHT_CYAN"Your Name:"COLOR_NONE);
         n = Read(fileno(stdin), cli_info.UserName, sizeof(cli_info.UserName));
         cli_info.UserName[n-1] = '\0'; //取消输入的'\n'
 
-        printf_flush("Your Passwd:");
+        printf_flush(LIGHT_CYAN"Your Passwd:"COLOR_NONE);
         DEBUG_LONG("Read from input n=%d\n", n);
         n = Read(fileno(stdin), cli_info.UserPasswd, sizeof(cli_info.UserPasswd));
         DEBUG_LONG("Read from input n=%d\n", n);
@@ -106,13 +105,13 @@ FIRST_IN:
 
         if(result[0] != 'Y')
         {
-            printf("User Name or Passwd Incorrect,Please Retry Below:\n");
+            printf(LIGHT_RED"User Name or Passwd Incorrect,Please Retry Below:\n"COLOR_NONE);
             clearbuf(0);
             goto FIRST_IN;
         }
         if(result[0] == 'Y')
         {
-            printf("Login Success,You Could Send Message To You Want!\n");
+            printf(LIGHT_CYAN"Login Success,You Could Send Message To You Want!\n"LIGHT_CYAN);
         }
 
     }
