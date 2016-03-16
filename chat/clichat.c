@@ -82,14 +82,15 @@ FIRST_IN:
         printf("client write %d byte to srv\n", n);
         n = Read(sockfd, loginresult, 10);
         printf("client read %d byte from srv\n", n);
-
-        if(loginresult[0] == 'Y')
-            DEBUG("login success\n");
-        if(loginresult[0] == 'N')
-            DEBUG("login fail\n");
-        DEBUG("next is clearbuf\n");
         clearbuf(1);
-        DEBUG("previous is clearbuf\n");
+
+        if(loginresult[0] != 'Y')
+        {
+            printf("User Name or Passwd Incorrect,Please Retry Below:\n");
+            clearbuf(0);
+            goto FIRST_IN;
+        }
+
     }
     cli_info.flag = SENDMSG;
     clearbuf(1);

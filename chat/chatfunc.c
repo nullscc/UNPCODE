@@ -112,7 +112,6 @@ void str_echo(int listenfd)
         {
             if( (cliselfd[i] != -1) )
             {
-                DEBUG("i=%d\n", i);
                 FD_SET(cliselfd[i], &rdset);
             }
         }
@@ -185,7 +184,8 @@ void str_echo(int listenfd)
                     {
                         if(cliselfd[i] != -1)
                         {
-
+                            if(!login_ok[i])
+                                continue;
                             ticks = time(NULL);
                             snprintf(cli_info.RealTime, sizeof(cli_info.RealTime), "%.24s", ctime(&ticks));
                             //memcpy(cli_info.RealTime, ctime(time(NULL)), );
@@ -194,7 +194,6 @@ void str_echo(int listenfd)
                     }
                     memset(&cli_info, 0, sizeof(struct chat_info));
                 }
-
                 }
 
         }
