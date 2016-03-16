@@ -20,9 +20,6 @@ int main(int argc, char**argv)
 	}
     memset(&cli_info, 0, sizeof(struct chat_info));
 
-    printf("-------- Welcome Linux Terminal Chat Room --------\n");
-    printf("Please Select Option Below:\n");
-
 	sockfd = Socket(AF_INET, SOCK_STREAM, 0);
 
 	srvaddr.sin_family = AF_INET;
@@ -31,6 +28,8 @@ int main(int argc, char**argv)
 
     Connect(sockfd, (SA*)&srvaddr, sizeof(srvaddr));
 
+    printf("-------- Welcome Linux Terminal Chat Room --------\n");
+    printf("Please Select Option Below:\n");
 FIRST_IN:
     printf("--------------------\n");
     printf("| 1:Register       |\n");
