@@ -60,7 +60,7 @@ void handle_login(struct chat_info *info, char *filename, int *login_flag, int f
     char bufname[50];
     char bufpasswd[50];
     char loginresult;
-    int n;
+
     DEBUG_LONG("excute handle_login\n");
     passwd_fd = open(filename, O_RDONLY);
     if(passwd_fd < 0)
@@ -92,8 +92,7 @@ void handle_login(struct chat_info *info, char *filename, int *login_flag, int f
                         DEBUG("login success\n");
                         login_flag[fdindex] = TRUE;
                         loginresult = 'Y';
-                        n = Writen(sockfd, &loginresult, 1);
-                        printf("write %d byte\n", n);
+                        Writen(sockfd, &loginresult, 1);
                         close(passwd_fd);
                         return;
                     }
@@ -107,8 +106,7 @@ void handle_login(struct chat_info *info, char *filename, int *login_flag, int f
     if(!login_flag[fdindex])
     {
         loginresult = 'N';
-        n = Writen(sockfd, &loginresult, 1);
-        printf("write %d byte\n", n);
+        Writen(sockfd, &loginresult, 1);
         DEBUG("login fail\n");
     }
     DEBUG("exit handle_login\n");
@@ -180,14 +178,14 @@ void str_echo(int listenfd)
                 {
                     if( (n < 0) && (errno == ECONNRESET) )
                     {
-                        printf("client[%d] has aborted the connection\n", i);
+                        printf("clien[%d] has aborted the connection\n", i);
                         continue;
                     }
                     else if(n < 0)
                         exit(1);
                     if(n == 0)
                     {
-                        printf("client[%d] has terminted the connection\n", i);
+                        printf("clien[%d] has terminted the connection\n", i);
                         FD_CLR(cliselfd[i], &rdset);
                         close(cliselfd[i]);
                         cliselfd[i] = -1;
@@ -197,18 +195,14 @@ void str_echo(int listenfd)
 
                 if(cli_info.flag == REGISTER)
                 {
-                    printf("file:%s,line:%d\n", __FILE__, __LINE__);
                     reg_to_passwd_file(&cli_info, "/etc/chat.passwd", cliselfd[i]);
                 }
                 else if(cli_info.flag == LOGIN)
                 {
-                    printf("file:%s,line:%d\n", __FILE__, __LINE__);
-                    printf("login cli_info.name is %s\n", cli_info.UserName);
                     handle_login(&cli_info, "/etc/chat.passwd", login_ok, i, cliselfd[i]);
                 }
                 else if(cli_info.flag == SENDMSG)
                 {
-                    printf("file:%s,line:%d\n", __FILE__, __LINE__);
                     for(i=1; i<=maxi; i++)
                     {
                         if(cliselfd[i] != -1)
