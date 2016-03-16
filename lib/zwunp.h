@@ -20,6 +20,9 @@
 #define PRINTF_RED(msg, arg...) \
     printf("\033[1;31m" "%s %s(%d) " msg "\033[m\n", __FILE__, __FUNCTION__, __LINE__ , ##arg)
 
+#define PRINTF_DESTINATION() \
+    printf("\033[1;31m" "%s %s(%d) " "\033[m\n", __FILE__, __FUNCTION__, __LINE__)
+
 #define DEBUG_LONG(msg, arg...) \
     printf( "%s %s(%d) " msg , __FILE__, __FUNCTION__, __LINE__ , ##arg)
 

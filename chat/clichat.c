@@ -11,7 +11,7 @@ int main(int argc, char**argv)
 	struct chat_info cli_info;
 	char option;
     int n;
-    char loginresult;
+    char loginresult[10];
 
 	if(argc != 2)
 	{
@@ -20,7 +20,7 @@ int main(int argc, char**argv)
 	}
     memset(&cli_info, 0, sizeof(struct chat_info));
 
-	printf("-------- Welcome Linux Terminal Chat Room --------\n");
+    printf("-------- Welcome Linux Terminal Chat Room --------\n");
     printf("Please Select Option Below:\n");
 
 	sockfd = Socket(AF_INET, SOCK_STREAM, 0);
@@ -29,7 +29,7 @@ int main(int argc, char**argv)
 	srvaddr.sin_port = htons(6677);
 	inet_aton(argv[1], &srvaddr.sin_addr);
 
-	Connect(sockfd, (SA*)&srvaddr, sizeof(srvaddr));
+    Connect(sockfd, (SA*)&srvaddr, sizeof(srvaddr));
 
 FIRST_IN:
     printf("--------------------\n");
@@ -79,17 +79,27 @@ FIRST_IN:
         printf_flush("Your Passwd:");
         n = Read(fileno(stdin), cli_info.UserPasswd, sizeof(cli_info.UserPasswd));
         cli_info.UserPasswd[n-1] = '\0'; //取消输入的'\n'
-        Writen(sockfd, &cli_info, sizeof(struct chat_info) - (MAXLINE-strlen(cli_info.msg)));
-        Read(sockfd, &loginresult, 1);
-        if(loginresult == 'Y')
-            DEBUG("login success\n");
-        if(loginresult == 'N')
-            DEBUG("login fail\n");
-        clearbuf();
-    }
+        n = Writen(sockfd, &cli_info, sizeof(struct chat_info) - (MAXLINE-strlen(cli_info.msg)));
+        printf("client write %d byte to srv\n", n);
+        n = Read(sockfd, loginresult, 10);
+        printf("client read %d byte from srv\n", n);
 
+        if(loginresult[0] == 'Y')
+            DEBUG("login success\n");
+        if(loginresult[0] == 'N')
+            DEBUG("login fail\n");
+        DEBUG("next is clearbuf\n");
+        clearbuf();
+        DEBUG("previous is clearbuf\n");
+    }
+    PRINTF_DESTINATION();
     cli_info.flag = SENDMSG;
+    PRINTF_DESTINATION();
     clearbuf();
+    n = Read(sockfd, loginresult, 10);
+    DEBUG("client read %d byte from srv\n", n);
+    DEBUG("read is %c\n", loginresult[0]);
+    DEBUG("next is strcli_select\n");
 	strcli_select(stdin, sockfd, &cli_info);
 
 

@@ -30,7 +30,8 @@ void handle_login(struct chat_info *info, char *filename, int *login_flag, int f
     char buf[100];
     char bufname[50];
     char bufpasswd[50];
-
+    char loginresult;
+    int n;
     DEBUG_LONG("excute handle_login\n");
     passwd_fd = open(filename, O_RDONLY);
     if(passwd_fd < 0)
@@ -60,7 +61,11 @@ void handle_login(struct chat_info *info, char *filename, int *login_flag, int f
                     {
                         DEBUG("login success\n");
                         login_flag[fdindex] = TRUE;
-                        Writen(sockfd, "Y", 1);
+                        loginresult = 'Y';
+                        n = Writen(sockfd, &loginresult, 1);
+                        printf("write %d byte\n", n);
+                        close(passwd_fd);
+                        return;
                     }
                 }
                 break;
@@ -71,9 +76,12 @@ void handle_login(struct chat_info *info, char *filename, int *login_flag, int f
     }
     if(!login_flag[fdindex])
     {
-        Writen(sockfd, "N", 1);
+        loginresult = 'N';
+        n = Writen(sockfd, &loginresult, 1);
+        printf("write %d byte\n", n);
         DEBUG("login fail\n");
     }
+    DEBUG("exit handle_login\n");
     close(passwd_fd);
 }
 
@@ -197,7 +205,9 @@ void strcli_select(FILE* fp, int fd, struct chat_info *msginfo)
         FD_SET(fileno(fp), &sel_rdset);
         FD_SET(fd, &sel_rdset);
         maxfd = max(fileno(fp), fd) + 1;
+        DEBUG("wait for data\n");
         Select(maxfd, &sel_rdset, NULL, NULL, NULL);
+        DEBUG("select return\n");
         if(FD_ISSET(fd, &sel_rdset))
         {
             if( Read(fd, &rcvinfo, sizeof(struct chat_info)) == 0)
@@ -208,7 +218,7 @@ void strcli_select(FILE* fp, int fd, struct chat_info *msginfo)
                 }
                 return;
             }
-            DEBUG("sockfd in %s has data\n", __FILE__);
+            DEBUG("sockfd in %s %d has data\n", __FILE__, __LINE__);
             printf("%s\n", rcvinfo.RealTime);
             printf("%s:\n", rcvinfo.UserName);
             printf("%s\n", rcvinfo.msg);
