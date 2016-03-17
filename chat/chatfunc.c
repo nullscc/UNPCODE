@@ -340,8 +340,6 @@ void strcli_select(FILE* fp, int fd, struct chat_info *msginfo)
                     }
                     get_prvname(msginfo->PrvName, &buf[2]);
                     get_prvmsg(msginfo->msg, &buf[2]);
-                    printf("prvname is:%s\n", msginfo->PrvName);
-                    printf("prvmsg is:%s\n", msginfo->msg);
                     Writen(fd, msginfo, sizeof(struct chat_info) - (MAXLINE-strlen(msginfo->msg)));
                     memset(buf, 0, MAXLINE);
                     memset(msginfo->msg, 0, MAXLINE);

@@ -20,7 +20,6 @@ enum Option
     MAXOPTION
 };
 
-
 struct chat_info
 {
 	char UserName[25];
