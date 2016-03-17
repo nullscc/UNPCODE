@@ -74,16 +74,13 @@ FIRST_IN:
         if(result[0] == 'M')
         {
             printf(LIGHT_RED"The User Name Has Already Be Register,Please Select Anothe Name:\n"COLOR_NONE);
-            clearbuf(0);
-            goto FIRST_IN;
         }
-        if(result[0] != 'Y')
+        if(result[0] == 'Y')
         {
-            printf(LIGHT_RED"Register Success,Please Select Option Below:\n"COLOR_NONE);
-            clearbuf(0);
-            goto FIRST_IN;
+            printf(LIGHT_CYAN"Register Success,Please Select Option Below:\n"COLOR_NONE);
         }
-
+        clearbuf(0);
+        goto FIRST_IN;
 
     }
     else if(cli_info.flag == LOGIN)
