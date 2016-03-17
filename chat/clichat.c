@@ -13,9 +13,9 @@ int main(int argc, char**argv)
     int n;
     char result[10];
 
-	if(argc != 2)
+    if(argc != 3)
 	{
-		printf("Usage:%s <IPAdress>\n", argv[0]);
+        printf("Usage:%s <IPAdress> <Port>\n", argv[0]);
 		return -1;
 	}
     memset(&cli_info, 0, sizeof(struct chat_info));
@@ -23,7 +23,7 @@ int main(int argc, char**argv)
 	sockfd = Socket(AF_INET, SOCK_STREAM, 0);
 
 	srvaddr.sin_family = AF_INET;
-	srvaddr.sin_port = htons(6677);
+    srvaddr.sin_port = htons(atoi(argv[2]));
 	inet_aton(argv[1], &srvaddr.sin_addr);
 
     Connect(sockfd, (SA*)&srvaddr, sizeof(srvaddr));
