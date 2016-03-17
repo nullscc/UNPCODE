@@ -98,4 +98,5 @@ void clearbuf(int flag);
 
 void printf_flush(char * const str);
 
+int isvalidip(char *ip);
 #endif

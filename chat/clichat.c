@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "chat.h"
+#include <netdb.h>
 
 int main(int argc, char**argv)
 {
@@ -10,21 +11,39 @@ int main(int argc, char**argv)
 	struct sockaddr_in srvaddr;
 	struct chat_info cli_info;
 	char option;
-    int n;
+    int n, i;
     char result[10];
-
+    struct hostent *h;
+    char ipstr[16];
     if(argc != 3)
 	{
-        printf("Usage:%s <IPAdress> <Port>\n", argv[0]);
+        printf("Usage:%s <IPAdress/Domain> <Port>\n", argv[0]);
 		return -1;
 	}
+    if(isvalidip(argv[1]))
+    {
+        inet_aton(argv[1], &srvaddr.sin_addr);
+    }
+    else
+    {
+        h = gethostbyname(argv[1]);
+        if(h==NULL)
+        {
+            herror("gethostbyname");
+            return -1;
+        }
+        for (i = 0; (h->h_addr_list)[i] != NULL; i++)
+        {
+            inet_ntop(AF_INET, (h->h_addr_list)[i], ipstr, 16);
+        }
+        inet_aton(ipstr, &srvaddr.sin_addr);
+    }
     memset(&cli_info, 0, sizeof(struct chat_info));
 
 	sockfd = Socket(AF_INET, SOCK_STREAM, 0);
 
 	srvaddr.sin_family = AF_INET;
     srvaddr.sin_port = htons(atoi(argv[2]));
-	inet_aton(argv[1], &srvaddr.sin_addr);
 
     Connect(sockfd, (SA*)&srvaddr, sizeof(srvaddr));
 

@@ -81,3 +81,42 @@ int Accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 	return connfd;
 }
 
+/*************************
+ * 判断一个字符串是否有效IP的要点：
+ * 1、只有数字和.
+ * 2、连续的数字不能超过3个
+ * 3、不能有连续的点，且点的个数有且必须是3个
+ ************************/
+int isvalidip(char *ip)
+{
+    int i;
+    int m = 0;  //最大的连续的数字个数
+    int n = 0;  //最大的连续的.的个数
+    int k = 0;  //点的个数
+    if( (ip == NULL)|| ( strlen(ip)<7 || strlen(ip)>15 ))
+        return FALSE;
+    for(i=0; i<16; i++)
+    {
+        if(ip[i] == '.')
+        {
+            n++;
+            k++;
+            if(n>2)
+                return FALSE;
+            m = 0;
+        }
+        else if( ip[i]>='0' && ip[i]<='9' )
+        {
+            m++;
+            if(m>3)
+                return FALSE;
+            n = 0;
+        }
+        else
+            return FALSE;
+    }
+    if(k != 3)
+        return FALSE;
+    return TRUE;
+
+}
