@@ -207,7 +207,7 @@ void str_echo(int listenfd)
                 }
                 else if(cli_info.flag == COMMAND)
                 {
-                    srv_handle_cmd(cliselfd[i], &cli_info, login_ok, maxi);
+                    srv_handle_cmd(cliselfd[i], &cli_info, login_ok, maxi, cli_record);
                     memset(&cli_info, 0, sizeof(struct chat_info));
                 }
                 else if(cli_info.flag == SENDMSG)
