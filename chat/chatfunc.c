@@ -9,7 +9,7 @@ void reg_to_passwd_file(struct chat_info *info, char *filename, int sockfd)
     char bufname[50];
     char registerresult;
     DEBUG_LONG("excute reg_to_passwd_file\n");
-    passwd_fd = open(filename, O_CREAT|O_APPEND|O_RDWR);
+    passwd_fd = open(filename, O_CREAT|O_APPEND|O_RDWR, S_IRWXU);
     if(passwd_fd < 0)
     {
         perror("open or create /etc/chat.passwd failed");
