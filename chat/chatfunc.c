@@ -227,7 +227,6 @@ void str_echo(int listenfd)
                     memset(&cli_info, 0, sizeof(struct chat_info));
                 }
                 }
-
         }
     }
 }

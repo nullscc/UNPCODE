@@ -6,9 +6,9 @@ void write_online_num_to_cli(int fd, int *login_ok, int maxi)
     char buf[10];
     int num_ret;
     num_ret = 0;
-    for(i=0; i<=maxi; i++)
+    for(i=1; i<=maxi; i++)
     {
-        if(login_ok)
+        if(login_ok[i])
             num_ret++;
     }
     snprintf(buf, 10, "%d", num_ret);
@@ -21,9 +21,9 @@ void write_online_name_to_cli(int *login_ok, struct user_info *info, int maxi, i
     char buf[FD_SETSIZE*25];
     int index = 0;
     int n;
-    for(i=0; i<=maxi; i++)
+    for(i=1; i<=maxi; i++)
     {
-        if(login_ok)
+        if(login_ok[i])
         {
             printf("i:%d\n", i);
             printf("info->name:%s\n", info[i].cliname);
@@ -74,7 +74,7 @@ void recieve_cmd_result_from_srv(int fd, struct chat_info *msginfo)
         Read(fd, buf, sizeof(buf));
         printf(YELLOW"%s online people\n"COLOR_NONE, buf);
     }
-    if( !strncmp(msginfo->cmd, "onlinename", 10) )
+    else if( !strncmp(msginfo->cmd, "onlinename", 10) )
     {
         Read(fd, buf, sizeof(buf));
         printf(YELLOW"online people:\n%s\n"COLOR_NONE, buf);
