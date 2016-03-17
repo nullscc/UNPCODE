@@ -103,9 +103,15 @@ FIRST_IN:
         DEBUG_LONG("Read from srv n=%d\n", n);
         clearbuf(1);
 
-        if(result[0] != 'Y')
+        if(result[0] == 'N')
         {
             printf(LIGHT_RED"User Name or Passwd Incorrect,Please Retry Below:\n"COLOR_NONE);
+            clearbuf(0);
+            goto FIRST_IN;
+        }
+        if(result[0] == 'R')
+        {
+            printf(LIGHT_RED"The User Has Already Logined,Please Retry Below:\n"COLOR_NONE);
             clearbuf(0);
             goto FIRST_IN;
         }

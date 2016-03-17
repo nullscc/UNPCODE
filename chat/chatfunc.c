@@ -53,7 +53,23 @@ void reg_to_passwd_file(struct chat_info *info, char *filename, int sockfd)
     close(passwd_fd);
 }
 
-void handle_login(struct chat_info *info, char *filename, int *login_flag, int fdindex, int sockfd)
+int has_logined(int *login_flag, struct chat_info *info, struct user_info *uinfo, int maxi)
+{
+    int i;
+    for(i=1; i<=maxi; i++)
+    {
+        if(!login_flag[i])
+            continue;
+        else
+        {
+            if( !strncmp(info->UserName, uinfo[i].cliname, strlen(info->UserName)) )
+                return 1;
+        }
+    }
+    return 0;
+}
+
+void handle_login(struct chat_info *info, char *filename, int *login_flag, int fdindex, int sockfd, struct user_info *uinfo, int maxi)
 {
     int passwd_fd;
     char buf[100];
@@ -90,8 +106,15 @@ void handle_login(struct chat_info *info, char *filename, int *login_flag, int f
                     if(!strncmp(bufpasswd, info->UserPasswd, strlen(bufpasswd) - i - 1))
                     {
                         DEBUG("login success\n");
-                        login_flag[fdindex] = TRUE;
-                        loginresult = 'Y';
+                        if(has_logined(login_flag, info, uinfo, maxi))
+                        {
+                            loginresult = 'R';
+                        }
+                        else
+                        {
+                            login_flag[fdindex] = TRUE;
+                            loginresult = 'Y';
+                        }
                         Writen(sockfd, &loginresult, 1);
                         close(passwd_fd);
                         return;
@@ -198,7 +221,7 @@ void str_echo(int listenfd)
                 }
                 else if(cli_info.flag == LOGIN)
                 {
-                    handle_login(&cli_info, "/etc/chat.passwd", login_ok, i, cliselfd[i]);
+                    handle_login(&cli_info, "/etc/chat.passwd", login_ok, i, cliselfd[i], cli_record, maxi);
                     if(login_ok[i])
                     {
                         memcpy(cli_record[i].cliname, cli_info.UserName, sizeof(cli_info.UserName));
