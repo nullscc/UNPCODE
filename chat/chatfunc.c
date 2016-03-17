@@ -233,6 +233,11 @@ void str_echo(int listenfd)
                     srv_handle_cmd(cliselfd[i], &cli_info, login_ok, maxi, cli_record);
                     memset(&cli_info, 0, sizeof(struct chat_info));
                 }
+                else if(cli_info.flag == PRIVATEMSG)
+                {
+                    srv_handle_prv_chat(cliselfd, &cli_info, login_ok, maxi, cli_record);
+                    memset(&cli_info, 0, sizeof(struct chat_info));
+                }
                 else if(cli_info.flag == SENDMSG)
                 {
                     for(i=1; i<=maxi; i++)
@@ -283,7 +288,14 @@ void strcli_select(FILE* fp, int fd, struct chat_info *msginfo)
             }
             DEBUG("sockfd in %s %d has data\n", __FILE__, __LINE__);
             printf(BROWN"%s\n"COLOR_NONE, rcvinfo.RealTime);
-            printf(LIGHT_PURPLE"%s:\n"COLOR_NONE, rcvinfo.UserName);
+            if(rcvinfo.flag == PRIVATEMSG)
+            {
+                printf(LIGHT_GREEN"@ from "COLOR_NONE);
+                printf(LIGHT_PURPLE"%s:\n"COLOR_NONE, rcvinfo.UserName);
+
+            }
+            else
+                printf(LIGHT_PURPLE"%s:\n"COLOR_NONE, rcvinfo.UserName);
             printf(LIGHT_CYAN"%s\n"COLOR_NONE, rcvinfo.msg);
 
             memset(&rcvinfo, 0, sizeof(struct chat_info));
@@ -303,13 +315,34 @@ void strcli_select(FILE* fp, int fd, struct chat_info *msginfo)
                 continue;
             if(buf[0] == ':')
             {
-                msginfo->flag = COMMAND;
-                memcpy(msginfo->cmd, &buf[1], strlen(&buf[1]));
-                send_cmd_to_srv(fd, msginfo);
-                recieve_cmd_result_from_srv(fd, msginfo);
-                memset(buf, 0, MAXLINE);
-                memset(msginfo->cmd, 0, sizeof(msginfo->cmd));
+                if(buf[1] == '@')
+                {
+                    msginfo->flag = PRIVATEMSG;
+                    get_prvname(msginfo->PrvName, &buf[2]);
+                    if(strlen(msginfo->PrvName) < 1)
+                    {
+                        printf(LIGHT_RED"Error Instruction!!!\n"COLOR_NONE);
+                        continue;
+                    }
+                    get_prvmsg(msginfo->msg, &buf[2]);
+                    printf("prvname is:%s\n", msginfo->PrvName);
+                    printf("prvmsg is:%s\n", msginfo->msg);
+                    Writen(fd, msginfo, sizeof(struct chat_info) - (MAXLINE-strlen(msginfo->msg)));
+                    memset(buf, 0, MAXLINE);
+                    memset(msginfo->msg, 0, MAXLINE);
+                    memset(msginfo->PrvName, 0, sizeof(msginfo->PrvName));
+                }
+                else
+                {
+                    msginfo->flag = COMMAND;
+                    memcpy(msginfo->cmd, &buf[1], strlen(&buf[1]));
+                    send_cmd_to_srv(fd, msginfo);
+                    recieve_cmd_result_from_srv(fd, msginfo);
+                    memset(buf, 0, MAXLINE);
+                    memset(msginfo->cmd, 0, sizeof(msginfo->cmd));
+                }
                 continue;
+
             }
             else
             {

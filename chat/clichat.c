@@ -114,7 +114,7 @@ FIRST_IN:
         }
         if(result[0] == 'Y')
         {
-            printf(LIGHT_CYAN"Login Success,You Could Send Message To You Want!\n"LIGHT_CYAN);
+            printf(LIGHT_CYAN"Login Success,You Could Send Message To You Want!\n"COLOR_NONE);
         }
 
     }

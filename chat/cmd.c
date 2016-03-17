@@ -85,3 +85,47 @@ void recieve_cmd_result_from_srv(int fd, struct chat_info *msginfo)
         printf(LIGHT_RED"%s\n"COLOR_NONE, buf);
     }
 }
+
+void get_prvname(char *prvname,char *buf)
+{
+    memset(prvname, 0, 25);
+    int i;
+    for(i=0; i<25; i++)
+    {
+        if(buf[i] == ' ')
+            break;
+    }
+    memcpy(prvname, buf, i);
+}
+
+void get_prvmsg(char *prvmsg, char *buf)
+{
+    memset(prvmsg, 0, MAXLINE);
+    int i;
+    for(i=0; i<MAXLINE; i++)
+    {
+        if(buf[i] == ' ')
+            break;
+    }
+    memcpy(prvmsg, &buf[i+1], strlen(&buf[i+1]));
+}
+
+void srv_handle_prv_chat(int *clifd, struct chat_info *info, int *login_ok, int maxi, struct user_info *uinfo)
+{
+    int i;
+    for(i=1;i<=maxi;i++)
+    {
+        if(login_ok[i])
+        {
+            if( !strncmp(info->PrvName, uinfo[i].cliname, strlen(info->PrvName)) )
+            {
+                time_t ticks;
+                ticks = time(NULL);
+                snprintf(info->RealTime, sizeof(info->RealTime), "%.24s", ctime(&ticks));
+                Writen(clifd[i], info, sizeof(struct chat_info) - (MAXLINE-strlen(info->msg)));
+                break;
+            }
+        }
+    }
+
+}

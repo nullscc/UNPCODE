@@ -32,6 +32,7 @@ enum Option
     REGISTER,
     LOGIN,
     COMMAND,
+    PRIVATEMSG,
     SENDMSG,
     MAXOPTION
 };
@@ -44,6 +45,7 @@ struct chat_info
 	char RealTime[30];
     enum Option flag;
     char cmd[20];
+    char PrvName[25];
 	char msg[MAXLINE];
 };
 
