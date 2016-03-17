@@ -133,6 +133,18 @@ ssize_t Read(int fd, void *ptr, size_t nbytes)
 	return(n);
 }
 
+ssize_t Sockread(int fd, void *ptr, size_t nbytes)
+{
+    ssize_t		n;
+
+    if ( (n = Read(fd, ptr, nbytes)) == 0)
+    {
+        printf(LIGHT_RED"server terminted prematurely\n"COLOR_NONE);
+        return -1;
+        exit(1);
+    }
+    return(n);
+}
 
 int Select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout)
 {
