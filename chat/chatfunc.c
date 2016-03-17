@@ -9,10 +9,11 @@ void reg_to_passwd_file(struct chat_info *info, char *filename, int sockfd)
     char bufname[50];
     char registerresult;
     DEBUG_LONG("excute reg_to_passwd_file\n");
+
     passwd_fd = open(filename, O_CREAT|O_APPEND|O_RDWR, S_IRWXU);
     if(passwd_fd < 0)
     {
-        perror("open or create /etc/chat.passwd failed");
+        perror("open or create /etc/chat/passwd failed");
         exit(1);
     }
 
@@ -78,10 +79,10 @@ void handle_login(struct chat_info *info, char *filename, int *login_flag, int f
     char loginresult;
 
     DEBUG_LONG("excute handle_login\n");
-    passwd_fd = open(filename, O_RDONLY);
+    passwd_fd = open(filename, O_CREAT|O_RDONLY, S_IRWXU);
     if(passwd_fd < 0)
     {
-        perror("open or create /etc/chat.passwd failed");
+        perror("open /etc/chat/passwd failed");
         exit(1);
     }
 
@@ -224,11 +225,11 @@ void str_echo(int listenfd)
 
                 if(cli_info.flag == REGISTER)
                 {
-                    reg_to_passwd_file(&cli_info, "/etc/chat.passwd", cliselfd[i]);
+                    reg_to_passwd_file(&cli_info, "/etc/chat/passwd", cliselfd[i]);
                 }
                 else if(cli_info.flag == LOGIN)
                 {
-                    handle_login(&cli_info, "/etc/chat.passwd", login_ok, i, cliselfd[i], cli_record, maxi);
+                    handle_login(&cli_info, "/etc/chat/passwd", login_ok, i, cliselfd[i], cli_record, maxi);
                     if(login_ok[i])
                     {
                         memcpy(cli_record[i].cliname, cli_info.UserName, sizeof(cli_info.UserName));

@@ -11,6 +11,7 @@ int main()
 {
     int listenfd;
     struct sockaddr_in srvaddr;
+    struct stat dirstat;
 
 	listenfd = Socket(AF_INET, SOCK_STREAM, 0);
 
@@ -22,6 +23,13 @@ int main()
 
 	Listen(listenfd, 100);
 
+    if ( 0 != stat("/etc/chat",&dirstat))   //If failed to get the status of this directory
+    {
+         if (ENOENT == errno) //If folder  not exist
+         {
+            mkdir("/etc/chat", S_IRWXU);
+         }
+    }
     str_echo(listenfd);
 	
 	return 0;
