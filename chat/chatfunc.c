@@ -201,6 +201,11 @@ void str_echo(int listenfd)
                     if( (n < 0) && (errno == ECONNRESET) )
                     {
                         printf("User:%s IP:%s:%d has aborted the connection\n", cli_record[i].cliname, inet_ntoa(cli_record[i].cliaddr.sin_addr), ntohs(cli_record[i].cliaddr.sin_port));
+                        FD_CLR(cliselfd[i], &rdset);
+                        close(cliselfd[i]);
+                        cliselfd[i] = -1;
+                        login_ok[i] = -1;
+                        memset(&cli_record[i], 0, sizeof(struct user_info));
                         continue;
                     }
                     else if(n < 0)
@@ -211,6 +216,8 @@ void str_echo(int listenfd)
                         FD_CLR(cliselfd[i], &rdset);
                         close(cliselfd[i]);
                         cliselfd[i] = -1;
+                        login_ok[i] = -1;
+                        memset(&cli_record[i], 0, sizeof(struct user_info));
                         continue;
                     }
                 }
@@ -235,7 +242,7 @@ void str_echo(int listenfd)
                 }
                 else if(cli_info.flag == PRIVATEMSG)
                 {
-                    srv_handle_prv_chat(cliselfd, &cli_info, login_ok, maxi, cli_record);
+                    srv_handle_prv_chat(i, cliselfd, &cli_info, login_ok, maxi, cli_record);
                     memset(&cli_info, 0, sizeof(struct chat_info));
                 }
                 else if(cli_info.flag == SENDMSG)
@@ -290,6 +297,13 @@ void strcli_select(FILE* fp, int fd, struct chat_info *msginfo)
             printf(BROWN"%s\n"COLOR_NONE, rcvinfo.RealTime);
             if(rcvinfo.flag == PRIVATEMSG)
             {
+                char uname[25] = {0};
+                if( !strncmp(rcvinfo.PrvName, uname, 25) )
+                {
+                    printf(LIGHT_RED"%s\n"COLOR_NONE, rcvinfo.msg);
+                    memset(&rcvinfo, 0, sizeof(struct chat_info));
+                    continue;
+                }
                 printf(LIGHT_GREEN"@ from "COLOR_NONE);
                 printf(LIGHT_PURPLE"%s:\n"COLOR_NONE, rcvinfo.UserName);
 
@@ -318,12 +332,12 @@ void strcli_select(FILE* fp, int fd, struct chat_info *msginfo)
                 if(buf[1] == '@')
                 {
                     msginfo->flag = PRIVATEMSG;
-                    get_prvname(msginfo->PrvName, &buf[2]);
-                    if(strlen(msginfo->PrvName) < 1)
+                    if( (buf[2]) == ' ' || (buf[2]) == '\n' )
                     {
                         printf(LIGHT_RED"Error Instruction!!!\n"COLOR_NONE);
                         continue;
                     }
+                    get_prvname(msginfo->PrvName, &buf[2]);
                     get_prvmsg(msginfo->msg, &buf[2]);
                     printf("prvname is:%s\n", msginfo->PrvName);
                     printf("prvmsg is:%s\n", msginfo->msg);

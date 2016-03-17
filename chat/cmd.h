@@ -17,6 +17,6 @@ void get_prvname(char *prvname, char *buf);
 
 void get_prvmsg(char *prvname, char *buf);
 
-void srv_handle_prv_chat(int *clifd, struct chat_info *info, int *login_ok, int maxi, struct user_info *uinfo);
+void srv_handle_prv_chat(int sendinex, int *clifd, struct chat_info *info, int *login_ok, int maxi, struct user_info *uinfo);
 
 #endif

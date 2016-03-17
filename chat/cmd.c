@@ -110,9 +110,10 @@ void get_prvmsg(char *prvmsg, char *buf)
     memcpy(prvmsg, &buf[i+1], strlen(&buf[i+1]));
 }
 
-void srv_handle_prv_chat(int *clifd, struct chat_info *info, int *login_ok, int maxi, struct user_info *uinfo)
+void srv_handle_prv_chat(int sendinex, int *clifd, struct chat_info *info, int *login_ok, int maxi, struct user_info *uinfo)
 {
     int i;
+    char errmsg[] = "Your @user is not online or not exist!!!";
     for(i=1;i<=maxi;i++)
     {
         if(login_ok[i])
@@ -128,4 +129,7 @@ void srv_handle_prv_chat(int *clifd, struct chat_info *info, int *login_ok, int 
         }
     }
 
+    memcpy(info->msg, errmsg, sizeof(errmsg));
+    memset(info->PrvName, 0, sizeof(info->PrvName));
+    Writen(clifd[sendinex], info, sizeof(struct chat_info) - (MAXLINE-strlen(info->msg)));
 }
