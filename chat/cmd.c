@@ -143,7 +143,9 @@ void srv_handle_prv_chat(int sendinex, int *clifd, struct chat_info *info, int *
                 ticks = time(NULL);
                 snprintf(info->RealTime, sizeof(info->RealTime), "%.24s", ctime(&ticks));
                 Writen(clifd[i], info, sizeof(struct chat_info) - (MAXLINE-strlen(info->msg)));
-                break;
+                memcpy(info->msg, errmsg, sizeof(errmsg));
+                memset(info->PrvName, 0, sizeof(info->PrvName));
+                return;
             }
         }
     }
