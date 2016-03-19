@@ -206,7 +206,7 @@ void str_echo(int listenfd)
                 {
                     if( (n < 0) && (errno == ECONNRESET) )
                     {
-                        printf("User:%s IP:%s:%d has aborted the connection\n", cli_record[i].cliname, inet_ntoa(cli_record[i].cliaddr.sin_addr), ntohs(cli_record[i].cliaddr.sin_port));
+                        printf_to_logfile("User:%s IP:%s:%d has aborted the connection\n", cli_record[i].cliname, inet_ntoa(cli_record[i].cliaddr.sin_addr), ntohs(cli_record[i].cliaddr.sin_port));
                         FD_CLR(cliselfd[i], &rdset);
                         close(cliselfd[i]);
                         cliselfd[i] = -1;
@@ -218,7 +218,7 @@ void str_echo(int listenfd)
                         exit(1);
                     if(n == 0)
                     {
-                        printf("User:%s IP:%s:%d has terminted the connection\n", cli_record[i].cliname, inet_ntoa(cli_record[i].cliaddr.sin_addr), ntohs(cli_record[i].cliaddr.sin_port));
+                        printf_to_logfile("User:%s IP:%s:%d has terminted the connection\n", cli_record[i].cliname, inet_ntoa(cli_record[i].cliaddr.sin_addr), ntohs(cli_record[i].cliaddr.sin_port));
                         FD_CLR(cliselfd[i], &rdset);
                         close(cliselfd[i]);
                         cliselfd[i] = -1;
@@ -231,6 +231,7 @@ void str_echo(int listenfd)
                 if(cli_info.flag == REGISTER)
                 {
                     reg_to_passwd_file(&cli_info, "/etc/chat/passwd", cliselfd[i]);
+                    printf_to_logfile("IP:%s:%d Register\n", inet_ntoa(cli_record[i].cliaddr.sin_addr), ntohs(cli_record[i].cliaddr.sin_port));
                 }
                 else if(cli_info.flag == LOGIN)
                 {
@@ -238,17 +239,19 @@ void str_echo(int listenfd)
                     if(login_ok[i])
                     {
                         memcpy(cli_record[i].cliname, cli_info.UserName, sizeof(cli_info.UserName));
-                        printf("User:%s IP:%s:%d Login\n", cli_record[i].cliname, inet_ntoa(cli_record[i].cliaddr.sin_addr), ntohs(cli_record[i].cliaddr.sin_port));
+                        printf_to_logfile("User:%s IP:%s:%d Login\n", cli_record[i].cliname, inet_ntoa(cli_record[i].cliaddr.sin_addr), ntohs(cli_record[i].cliaddr.sin_port));
                     }
                 }
                 else if(cli_info.flag == COMMAND)
                 {
                     srv_handle_cmd(cliselfd[i], &cli_info, login_ok, maxi, cli_record);
+                    printf_to_logfile("User:%s IP:%s:%d Send Command:%s", cli_record[i].cliname, inet_ntoa(cli_record[i].cliaddr.sin_addr), ntohs(cli_record[i].cliaddr.sin_port), cli_info.cmd);
                     memset(&cli_info, 0, sizeof(struct chat_info));
                 }
                 else if(cli_info.flag == PRIVATEMSG)
                 {
                     srv_handle_prv_chat(i, cliselfd, &cli_info, login_ok, maxi, cli_record);
+                    printf_to_logfile("User:%s IP:%s:%d Private To:%s\n", cli_record[i].cliname, inet_ntoa(cli_record[i].cliaddr.sin_addr), ntohs(cli_record[i].cliaddr.sin_port), cli_info.PrvName);
                     memset(&cli_info, 0, sizeof(struct chat_info));
                 }
                 else if(cli_info.flag == SENDMSG)
@@ -261,6 +264,7 @@ void str_echo(int listenfd)
                                 continue;
                             ticks = time(NULL);
                             snprintf(cli_info.RealTime, sizeof(cli_info.RealTime), "%.24s", ctime(&ticks));
+                            printf_to_logfile("User:%s IP:%s:%d Send Group MSG:%s", cli_record[i].cliname, inet_ntoa(cli_record[i].cliaddr.sin_addr), ntohs(cli_record[i].cliaddr.sin_port), cli_info.msg);
                             //memcpy(cli_info.RealTime, ctime(time(NULL)), );
                             Writen(cliselfd[i], &cli_info, sizeof(struct chat_info) - (MAXLINE-strlen(cli_info.msg)));
                         }
