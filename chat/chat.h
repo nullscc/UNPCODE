@@ -10,8 +10,8 @@
 
 #define OPEN_MAX 256
 
-#define SRVLOG "/etc/chat/log"
-#define CHATLOG "/etc/chat/chatlog"
+#define SRVLOGDIR "/etc/chat/log/"
+#define CHATLOGDIR "/etc/chat/chatlog/"
 
 enum Option
 {

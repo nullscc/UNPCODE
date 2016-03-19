@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <unistd.h>
+#include <dirent.h>
+#include <sys/stat.h>
 
 
 ssize_t writen(int fd, const void *buf, size_t count)
@@ -185,3 +187,22 @@ void printf_flush(char * const str)
     fflush(stdout); //加上fflush强制刷新缓冲区
 }
 
+int is_dir_exist(const char *path)
+{
+    struct stat dirstat;
+
+    if(path == NULL)
+        return 0;
+    if(stat(path, &dirstat) == -1)
+    {
+        return 0;
+    }
+    else
+    {
+        if(S_ISDIR(dirstat.st_mode))
+            return 1;
+        else return 0;
+    }
+    return 0;
+
+}

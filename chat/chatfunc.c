@@ -396,20 +396,76 @@ void gettime_logformat(char *buf)
     hour  = tm_t->tm_hour;
     min   = tm_t->tm_min;
     second= tm_t->tm_sec;
-    snprintf(buf, 15, "%d%02d%02d%02d%02d%02d\n", year, month, day, hour, min, second);
+    snprintf(buf, 15, "%d%02d%02d%02d%02d%02d", year, month, day, hour, min, second);
 
+}
+
+void gettime_date(char *buf)
+{
+    struct tm *tm_t;
+    int year, month, day;
+    time_t ticks;
+
+    ticks = time(NULL);
+    tm_t = localtime(&ticks);
+
+    year  = 1900 + tm_t->tm_year;
+    month = tm_t->tm_mon + 1;
+    day   = tm_t->tm_mday;
+
+    snprintf(buf, 9, "%d%02d%02d", year, month, day);
+
+}
+
+int
+myfprintf (FILE *stream, const char *format, va_list *arg)
+{
+
+  int done;
+
+  done = vfprintf (stream, format, *arg);
+
+  return done;
 }
 
 void printf_to_logfile(const char *format, ...)
 {
     char buf[15];
+    char date[9];
+    char datefilename[30] = SRVLOGDIR;
+    FILE *fp;
+
     va_list arg;
-    memset(buf, 0, sizeof(buf));
     va_start (arg, format);
+
+    memset(buf, 0, sizeof(buf));
+    memset(date, 0, sizeof(date));
+
+    if(!is_dir_exist(SRVLOGDIR))
+    {
+        if(mkdir(SRVLOGDIR, S_IRWXU) < 0)
+        {
+            perror("mkdir error");
+            return;
+        }
+    }
+    gettime_date(date);
+    strcat(datefilename, date);
+
+    fp = fopen(datefilename, "a+");
+    if(fp == NULL)
+    {
+        perror("fopen error");
+        return;
+    }
+
     gettime_logformat(buf);
-    printf("%s:  ", buf);
-    fflush(stdout);
+
+    fprintf(fp, "%s:  ", buf);
+    //fflush(stdout);
     //printf(format， arg); //用这个参数传不进来
-    vfprintf(stdout, format, arg); //必须用这个
-    va_end (arg);
+    //fprintf(fp, format, arg); //必须用这个vfprintf(stdout, format, arg)
+    myfprintf(fp, format, &arg); //arg不能穿越结构体
+    va_end(arg);
+    fclose(fp);
 }

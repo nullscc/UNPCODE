@@ -100,4 +100,6 @@ void clearbuf(int flag);
 void printf_flush(char * const str);
 
 int isvalidip(char *ip);
+
+int is_dir_exist(const char *path);
 #endif
