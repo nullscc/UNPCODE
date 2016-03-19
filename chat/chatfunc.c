@@ -2,6 +2,8 @@
 #include "chat.h"
 #include "zwunp.h"
 #include "cmd.h"
+#include <time.h>
+
 void reg_to_passwd_file(struct chat_info *info, char *filename, int sockfd)
 {
     int passwd_fd;
@@ -146,6 +148,8 @@ void str_echo(int listenfd)
     struct user_info cli_record[FD_SETSIZE];
     struct chat_info cli_info;
     time_t ticks;
+    char logbuf[MAXLINE];
+    memset(logbuf, 0, MAXLINE);
     memset(&cli_info, 0, sizeof(struct chat_info));
     for(i=0; i<FD_SETSIZE; i++)
     {
@@ -187,7 +191,8 @@ void str_echo(int listenfd)
                     }
                 }
                 connfd = Accept(listenfd, (SA *)&cli_record[i].cliaddr, &len);
-                printf("%s:%d connected\n", inet_ntoa(cli_record[i].cliaddr.sin_addr), ntohs(cli_record[i].cliaddr.sin_port));
+
+                printf_to_logfile("%s:%d connected\n", inet_ntoa(cli_record[i].cliaddr.sin_addr), ntohs(cli_record[i].cliaddr.sin_port));
                 nready--;
                 if(connfd > maxfd)
                     maxfd = connfd;
@@ -378,3 +383,33 @@ int file_exists(char *filename)
     return (access(filename, 0) == 0);
 }
 
+void gettime_logformat(char *buf)
+{
+    struct tm *tm_t;
+    int year, month, day, hour, min, second;
+    time_t ticks;
+    ticks = time(NULL);
+    tm_t = localtime(&ticks);
+    year  = 1900 + tm_t->tm_year;
+    month = tm_t->tm_mon + 1;
+    day   = tm_t->tm_mday;
+    hour  = tm_t->tm_hour;
+    min   = tm_t->tm_min;
+    second= tm_t->tm_sec;
+    snprintf(buf, 15, "%d%02d%02d%02d%02d%02d\n", year, month, day, hour, min, second);
+
+}
+
+void printf_to_logfile(const char *format, ...)
+{
+    char buf[15];
+    va_list arg;
+    memset(buf, 0, sizeof(buf));
+    va_start (arg, format);
+    gettime_logformat(buf);
+    printf("%s:  ", buf);
+    fflush(stdout);
+    //printf(format， arg); //用这个参数传不进来
+    vfprintf(stdout, format, arg); //必须用这个
+    va_end (arg);
+}

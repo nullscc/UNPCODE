@@ -6,8 +6,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <stdarg.h>
 
 #define OPEN_MAX 256
+
+#define SRVLOG "/etc/chat/log"
+#define CHATLOG "/etc/chat/chatlog"
 
 enum Option
 {
@@ -42,5 +46,7 @@ void strcli_select(FILE* fp, int fd, struct chat_info *msginfo);
 void str_echo(int listenfd);
 
 int file_exists(char *filename);
+
+void printf_to_logfile(const char *format, ...);
 
 #endif
