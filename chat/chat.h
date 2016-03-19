@@ -28,7 +28,7 @@ struct chat_info
 {
 	char UserName[25];
     char UserPasswd[20];
-	char RealTime[30];
+    char RealTime[10];
     enum Option flag;
     char cmd[20];
     char PrvName[25];
@@ -48,5 +48,9 @@ void str_echo(int listenfd);
 int file_exists(char *filename);
 
 void printf_to_logfile(const char *format, ...);
+
+void printf_to_chatlog_file(const char *format, ...);
+
+void gettime_hourminsec(char *buf);
 
 #endif

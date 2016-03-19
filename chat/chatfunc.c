@@ -147,7 +147,6 @@ void str_echo(int listenfd)
     int login_ok[FD_SETSIZE];
     struct user_info cli_record[FD_SETSIZE];
     struct chat_info cli_info;
-    time_t ticks;
     char logbuf[MAXLINE];
     memset(logbuf, 0, MAXLINE);
     memset(&cli_info, 0, sizeof(struct chat_info));
@@ -191,7 +190,6 @@ void str_echo(int listenfd)
                     }
                 }
                 connfd = Accept(listenfd, (SA *)&cli_record[i].cliaddr, &len);
-
                 printf_to_logfile("%s:%d connected\n", inet_ntoa(cli_record[i].cliaddr.sin_addr), ntohs(cli_record[i].cliaddr.sin_port));
                 nready--;
                 if(connfd > maxfd)
@@ -251,24 +249,26 @@ void str_echo(int listenfd)
                 else if(cli_info.flag == PRIVATEMSG)
                 {
                     srv_handle_prv_chat(i, cliselfd, &cli_info, login_ok, maxi, cli_record);
-                    printf_to_logfile("User:%s IP:%s:%d Private To:%s\n", cli_record[i].cliname, inet_ntoa(cli_record[i].cliaddr.sin_addr), ntohs(cli_record[i].cliaddr.sin_port), cli_info.PrvName);
+                    printf_to_logfile("User:%s IP:%s:%d Private To:%s:%s\n", cli_record[i].cliname, inet_ntoa(cli_record[i].cliaddr.sin_addr), ntohs(cli_record[i].cliaddr.sin_port), cli_info.PrvName, cli_info.msg);
                     memset(&cli_info, 0, sizeof(struct chat_info));
                 }
+
                 else if(cli_info.flag == SENDMSG)
                 {
+                    gettime_hourminsec(cli_info.RealTime);
                     for(i=1; i<=maxi; i++)
                     {
                         if(cliselfd[i] != -1)
                         {
                             if(!login_ok[i])
                                 continue;
-                            ticks = time(NULL);
-                            snprintf(cli_info.RealTime, sizeof(cli_info.RealTime), "%.24s", ctime(&ticks));
-                            printf_to_logfile("User:%s IP:%s:%d Send Group MSG:%s", cli_record[i].cliname, inet_ntoa(cli_record[i].cliaddr.sin_addr), ntohs(cli_record[i].cliaddr.sin_port), cli_info.msg);
-                            //memcpy(cli_info.RealTime, ctime(time(NULL)), );
+
+
                             Writen(cliselfd[i], &cli_info, sizeof(struct chat_info) - (MAXLINE-strlen(cli_info.msg)));
                         }
                     }
+                    printf_to_chatlog_file("%s\n%s:%s\n", cli_info.RealTime, cli_info.UserName, cli_info.msg);
+                    printf_to_logfile("User:%s IP:%s:%d Send Group MSG:%s", cli_record[i].cliname, inet_ntoa(cli_record[i].cliaddr.sin_addr), ntohs(cli_record[i].cliaddr.sin_port), cli_info.msg);
                     memset(&cli_info, 0, sizeof(struct chat_info));
                 }
                 }
@@ -404,6 +404,21 @@ void gettime_logformat(char *buf)
 
 }
 
+void gettime_hourminsec(char *buf)
+{
+    struct tm *tm_t;
+    int hour, min, sec;
+    time_t ticks;
+
+    ticks = time(NULL);
+    tm_t = localtime(&ticks);
+
+    hour  = tm_t->tm_hour;
+    min   = tm_t->tm_min;
+    sec= tm_t->tm_sec;
+    snprintf(buf, 10, "%02d:%02d:%02d", hour, min, sec);
+}
+
 void gettime_date(char *buf)
 {
     struct tm *tm_t;
@@ -469,6 +484,42 @@ void printf_to_logfile(const char *format, ...)
     //fflush(stdout);
     //printf(format， arg); //用这个参数传不进来
     //fprintf(fp, format, arg); //必须用这个vfprintf(stdout, format, arg)
+    myfprintf(fp, format, &arg); //arg不能穿越结构体
+    va_end(arg);
+    fclose(fp);
+}
+
+
+void printf_to_chatlog_file(const char *format, ...)
+{
+    char buf[15];
+    char date[9];
+    char datefilename[30] = CHATLOGDIR;
+    FILE *fp;
+
+    va_list arg;
+    va_start (arg, format);
+
+    memset(buf, 0, sizeof(buf));
+    memset(date, 0, sizeof(date));
+
+    if(!is_dir_exist(datefilename))
+    {
+        if(mkdir(datefilename, S_IRWXU) < 0)
+        {
+            perror("mkdir error");
+            return;
+        }
+    }
+    gettime_date(date);
+    strcat(datefilename, date);
+
+    fp = fopen(datefilename, "a+");
+    if(fp == NULL)
+    {
+        perror("fopen error");
+        return;
+    }
     myfprintf(fp, format, &arg); //arg不能穿越结构体
     va_end(arg);
     fclose(fp);

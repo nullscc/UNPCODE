@@ -78,7 +78,6 @@ int Connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 int Listen(int sockfd, int backlog);
 
 int Accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
-
 ssize_t Writen(int fd, const void *buf, size_t count);
 
 char *Fgets(char *s, int size, FILE *stream);

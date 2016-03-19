@@ -139,9 +139,7 @@ void srv_handle_prv_chat(int sendinex, int *clifd, struct chat_info *info, int *
         {
             if( !strncmp(info->PrvName, uinfo[i].cliname, strlen(info->PrvName)) )
             {
-                time_t ticks;
-                ticks = time(NULL);
-                snprintf(info->RealTime, sizeof(info->RealTime), "%.24s", ctime(&ticks));
+                gettime_hourminsec(info->RealTime);
                 Writen(clifd[i], info, sizeof(struct chat_info) - (MAXLINE-strlen(info->msg)));
                 memcpy(info->msg, errmsg, sizeof(errmsg));
                 return;
