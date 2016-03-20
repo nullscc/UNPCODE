@@ -1,11 +1,4 @@
-#include "zwunp.h"
-#include <errno.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <time.h>
 #include "chat.h"
-
-
 
 int main(int argc, char **argv)
 {
@@ -18,7 +11,7 @@ int main(int argc, char **argv)
         printf("Usage:%s <Port>\n", argv[0]);
         return -1;
     }
-
+    printf("at line:%d\n", __LINE__);
 	listenfd = Socket(AF_INET, SOCK_STREAM, 0);
 
 	srvaddr.sin_family = AF_INET;
@@ -36,6 +29,7 @@ int main(int argc, char **argv)
             mkdir("/etc/chat", S_IRWXU);
          }
     }
+    printf("at line:%d\n", __LINE__);
     str_echo(listenfd);
 	
 	return 0;

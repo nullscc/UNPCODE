@@ -1,7 +1,7 @@
 #ifndef _CMD_H_
 #define _CMD_H_
+#include "cmd.h"
 #include "chat.h"
-#include "zwunp.h"
 
 void write_online_num_to_cli(int fd, int *login_ok, int maxi);
 

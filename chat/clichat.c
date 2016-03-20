@@ -1,7 +1,3 @@
-#include "zwunp.h"
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
 #include "chat.h"
 #include <netdb.h>
 

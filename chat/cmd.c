@@ -68,7 +68,6 @@ void srv_handle_cmd(int fd, struct chat_info *info, int *login_ok, int maxi, str
 
 }
 
-
 void send_cmd_to_srv(int fd, struct chat_info *msginfo)
 {
     Writen(fd, msginfo, sizeof(struct chat_info));

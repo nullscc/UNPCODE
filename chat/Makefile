@@ -1,15 +1,14 @@
-include ../config
-
-PROGS = clichat srvchat 
+PROGS  = clichat srvchat 
+OBJECT = chatfunc.o cmd.o wrapsock.o wrapio.o
+CC = gcc
 
 all:${PROGS}
 
-clichat:clichat.o chatfunc.o cmd.o ../libzwunp.a
+clichat:clichat.o ${OBJECT}
 	${CC} ${CFLAGS} -o $@ $^
 
-srvchat:srvchat.o chatfunc.o cmd.o ../libzwunp.a
+srvchat:srvchat.o ${OBJECT}
 	${CC} ${CFLAGS} -o $@ $^
 
-chatfunc.o:cmd.o
 clean:
 	rm -f ${PROGS} *.o

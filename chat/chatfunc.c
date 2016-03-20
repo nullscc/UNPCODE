@@ -1,8 +1,8 @@
-#include <stdio.h>
-#include "chat.h"
-#include "zwunp.h"
-#include "cmd.h"
+#include "chatfunc.h"
 #include <time.h>
+#include "wrapio.h"
+#include <stdio.h>
+#include <stdarg.h>
 
 void reg_to_passwd_file(struct chat_info *info, char *filename, int sockfd)
 {
@@ -150,6 +150,7 @@ void str_echo(int listenfd)
     char logbuf[MAXLINE];
     memset(logbuf, 0, MAXLINE);
     memset(&cli_info, 0, sizeof(struct chat_info));
+    printf("at line:%d\n", __LINE__);
     for(i=0; i<FD_SETSIZE; i++)
     {
         cliselfd[i] = -1;
@@ -159,6 +160,7 @@ void str_echo(int listenfd)
     maxfd = listenfd;
     maxi = 0;
     FD_ZERO(&rdset);
+    printf("at line:%d\n", __LINE__);
     for(;;)
     {
         for(i=0; i<=maxi; i++)
@@ -168,6 +170,7 @@ void str_echo(int listenfd)
                 FD_SET(cliselfd[i], &rdset);
             }
         }
+        printf("at line:%d\n", __LINE__);
         nready = Select(maxfd+1, &rdset, NULL, NULL, NULL);
         for(i=0; i <= maxi; i++)
         {
@@ -190,7 +193,9 @@ void str_echo(int listenfd)
                     }
                 }
                 connfd = Accept(listenfd, (SA *)&cli_record[i].cliaddr, &len);
+                printf("at line:%d\n", __LINE__);
                 printf_to_logfile("%s:%d connected\n", inet_ntoa(cli_record[i].cliaddr.sin_addr), ntohs(cli_record[i].cliaddr.sin_port));
+                printf("at line:%d\n", __LINE__);
                 nready--;
                 if(connfd > maxfd)
                     maxfd = connfd;
@@ -200,6 +205,7 @@ void str_echo(int listenfd)
             if(FD_ISSET(cliselfd[i], &rdset))
             {
                 nready--;
+                printf("at line:%d\n", __LINE__);
                 if( (n = Read(cliselfd[i], &cli_info, sizeof(struct chat_info))) <= 0 )
                 {
                     if( (n < 0) && (errno == ECONNRESET) )
@@ -437,13 +443,15 @@ void gettime_date(char *buf)
 }
 
 int
-myfprintf (FILE *stream, const char *format, va_list *arg)
+myfprintf (FILE *stream, const char *format, va_list arg)
 {
 
   int done;
-
-  done = vfprintf (stream, format, *arg);
-
+  va_list aq;
+  va_copy(aq,arg);
+    printf("at line:%d\n", __LINE__);
+  done = vfprintf (stream, format, aq);
+printf("at line:%d\n", __LINE__);
   return done;
 }
 
@@ -453,13 +461,13 @@ void printf_to_logfile(const char *format, ...)
     char date[9];
     char datefilename[30] = SRVLOGDIR;
     FILE *fp;
-
+    printf("at line:%d\n", __LINE__);
     va_list arg;
     va_start (arg, format);
 
     memset(buf, 0, sizeof(buf));
     memset(date, 0, sizeof(date));
-
+    printf("at line:%d\n", __LINE__);
     if(!is_dir_exist(SRVLOGDIR))
     {
         if(mkdir(SRVLOGDIR, S_IRWXU) < 0)
@@ -468,6 +476,7 @@ void printf_to_logfile(const char *format, ...)
             return;
         }
     }
+    printf("at line:%d\n", __LINE__);
     gettime_date(date);
     strcat(datefilename, date);
 
@@ -479,14 +488,18 @@ void printf_to_logfile(const char *format, ...)
     }
 
     gettime_logformat(buf);
-
+    printf("at line:%d\n", __LINE__);
     fprintf(fp, "%s:  ", buf);
+    printf("at line:%d\n", __LINE__);
     //fflush(stdout);
     //printf(format， arg); //用这个参数传不进来
     //fprintf(fp, format, arg); //必须用这个vfprintf(stdout, format, arg)
-    myfprintf(fp, format, &arg); //arg不能穿越结构体
+    myfprintf(fp, format, arg); //arg不能穿越结构体
+    printf("at line:%d\n", __LINE__);
     va_end(arg);
+    printf("at line:%d\n", __LINE__);
     fclose(fp);
+    printf("at line:%d\n", __LINE__);
 }
 
 
@@ -520,7 +533,7 @@ void printf_to_chatlog_file(const char *format, ...)
         perror("fopen error");
         return;
     }
-    myfprintf(fp, format, &arg); //arg不能穿越结构体
+    myfprintf(fp, format, arg); //arg不能穿越结构体
     va_end(arg);
     fclose(fp);
 }
