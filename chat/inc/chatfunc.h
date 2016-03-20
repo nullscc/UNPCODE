@@ -21,7 +21,7 @@ void gettime_hourminsec(char *buf);
 
 void gettime_date(char *buf);
 
-int myfprintf(FILE *stream, const char *format, va_list arg);
+int myfprintf(FILE *stream, const char *format, va_list *arg);
 
 void printf_to_logfile(const char *format, ...);
 

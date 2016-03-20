@@ -440,15 +440,11 @@ void gettime_date(char *buf)
 }
 
 int
-myfprintf (FILE *stream, const char *format, va_list arg)
+myfprintf (FILE *stream, const char *format, va_list *arg)
 {
 
   int done;
-  va_list aq;
-  va_copy(aq,arg);
-    printf("at line:%d\n", __LINE__);
-  done = vfprintf (stream, format, aq);
-printf("at line:%d\n", __LINE__);
+  done = vfprintf (stream, format, *arg);
   return done;
 }
 
@@ -488,7 +484,7 @@ void printf_to_logfile(const char *format, ...)
     //fflush(stdout);
     //printf(format， arg); //用这个参数传不进来
     //fprintf(fp, format, arg); //必须用这个vfprintf(stdout, format, arg)
-    myfprintf(fp, format, arg); //arg不能穿越结构体
+    myfprintf(fp, format, &arg); //arg不能穿越结构体
 
     va_end(arg);
 
@@ -526,7 +522,7 @@ void printf_to_chatlog_file(const char *format, ...)
         perror("fopen error");
         return;
     }
-    myfprintf(fp, format, arg); //arg不能穿越结构体
+    myfprintf(fp, format, &arg); //arg不能穿越结构体
     va_end(arg);
     fclose(fp);
 }
