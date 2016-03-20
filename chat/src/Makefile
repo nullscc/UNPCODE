@@ -1,6 +1,6 @@
 PROGS  = clichat srvchat 
 OBJECT = chatfunc.o cmd.o wrapsock.o wrapio.o
-CC = gcc
+CC = gcc -I../inc
 
 all:${PROGS}
 

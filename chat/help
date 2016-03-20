@@ -3,4 +3,5 @@ This program supports below instruction:
 
 :onlinenum  [get how many people online]
 :onlinename [list online people's nickname]
+:@nickname  [private chat to nickname]
 :help	    [show this info]
