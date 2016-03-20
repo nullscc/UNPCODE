@@ -1,5 +1,8 @@
 #include "cmd.h"
 
+/*************************************
+ * 功能：服务端收到客户端发送过来的查询当前在线人数的指令，将人数以字符串的形式反馈回去
+ ************************************/
 void write_online_num_to_cli(int fd, int *login_ok, int maxi)
 {
     int i;
@@ -15,6 +18,9 @@ void write_online_num_to_cli(int fd, int *login_ok, int maxi)
     Writen(fd, buf, strlen(buf));
 }
 
+/*************************************
+ * 功能：服务端收到客户端发送过来的查询当前在线名单的指令，将名单以字符串的形式反馈回去
+ ************************************/
 void write_online_name_to_cli(int *login_ok, struct user_info *info, int maxi, int fd)
 {
     int i;
@@ -36,6 +42,9 @@ void write_online_name_to_cli(int *login_ok, struct user_info *info, int maxi, i
     Writen(fd, buf, strlen(buf));
 }
 
+/*************************************
+ * 功能：服务端收到客户端发送过来的帮助指令，将/etc/chat/help发送给客户端
+ ************************************/
 void write_help_info_to_cli(int fd)
 {
     char buf[FD_SETSIZE*25];
@@ -46,6 +55,9 @@ void write_help_info_to_cli(int fd)
     Writen(fd, buf, strlen(buf));
 }
 
+/*************************************
+ * 功能：服务端处理客户发过来的指令封包
+ ************************************/
 void srv_handle_cmd(int fd, struct chat_info *info, int *login_ok, int maxi, struct user_info *uinfo)
 {
     DEBUG("cmd is:%s\n", info->cmd);
@@ -68,11 +80,17 @@ void srv_handle_cmd(int fd, struct chat_info *info, int *login_ok, int maxi, str
 
 }
 
+/*************************************
+ * 功能：客户端发送指令封包给服务端
+ ************************************/
 void send_cmd_to_srv(int fd, struct chat_info *msginfo)
 {
     Writen(fd, msginfo, sizeof(struct chat_info));
 }
 
+/*************************************
+ * 功能：客户端接收服务端对客户端发过去的指令封包的反馈，并打印结果
+ ************************************/
 void recieve_cmd_result_from_srv(int fd, struct chat_info *msginfo)
 {
     char buf[FD_SETSIZE*25];
@@ -104,6 +122,9 @@ void recieve_cmd_result_from_srv(int fd, struct chat_info *msginfo)
     }
 }
 
+/*************************************
+ * 功能：客户端从形参buf中提取Username字段，并存入prvname
+ ************************************/
 void get_prvname(char *prvname,char *buf)
 {
     memset(prvname, 0, 25);
@@ -116,6 +137,9 @@ void get_prvname(char *prvname,char *buf)
     memcpy(prvname, buf, i);
 }
 
+/*************************************
+ * 功能：客户端从形参buf中提取msg字段，并存入prvmsg
+ ************************************/
 void get_prvmsg(char *prvmsg, char *buf)
 {
     memset(prvmsg, 0, MAXLINE);
@@ -128,6 +152,9 @@ void get_prvmsg(char *prvmsg, char *buf)
     memcpy(prvmsg, &buf[i+1], strlen(&buf[i+1]));
 }
 
+/*************************************
+ * 功能：服务器端处理客户端发送过来的私聊封包
+ ************************************/
 void srv_handle_prv_chat(int sendinex, int *clifd, struct chat_info *info, int *login_ok, int maxi, struct user_info *uinfo)
 {
     int i;

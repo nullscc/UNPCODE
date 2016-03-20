@@ -1,6 +1,11 @@
 #include "chat.h"
 #include <netdb.h>
 
+
+/**************************
+ *功能：客户端运行起始处,程序运行方法：
+ *  clichat <IP地址/域名> <端口>
+ *************************/
 int main(int argc, char**argv)
 {
 	int sockfd;
@@ -16,16 +21,17 @@ int main(int argc, char**argv)
         printf("Usage:%s <IPAdress/Domain> <Port>\n", argv[0]);
 		return -1;
 	}
-    if(isvalidip(argv[1]))
+    if(isvalidip(argv[1])) /* 判断输入的是不是IP，如果不是IP，就当域名来处理 */
     {
         inet_aton(argv[1], &srvaddr.sin_addr);
     }
     else
     {
-        h = gethostbyname(argv[1]);
+        h = gethostbyname(argv[1]); /* 有时候不起作用，或者干脆运行失败，不知道什么情况 */
         if(h==NULL)
         {
             herror("gethostbyname");
+            printf(LIGHT_RED"Get domain's IP address failed,Please use IP instead of domain and restart the program!!\n"COLOR_NONE);
             return -1;
         }
         for (i = 0; (h->h_addr_list)[i] != NULL; i++)
@@ -57,11 +63,11 @@ FIRST_IN:
     {
         cli_info.flag = REGISTER;
         printf_flush(LIGHT_CYAN"Please Input An User Name:"COLOR_NONE);
-        n = Read(fileno(stdin), cli_info.UserName, sizeof(cli_info.UserName));
+        n = Sockread(fileno(stdin), cli_info.UserName, sizeof(cli_info.UserName));
         cli_info.UserName[n-1] = '\0'; //取消输入的'\n'
 
         printf_flush(LIGHT_CYAN"Please Input A passwd:"COLOR_NONE);
-        n = Read(fileno(stdin), cli_info.UserPasswd, sizeof(cli_info.UserPasswd));
+        n = Sockread(fileno(stdin), cli_info.UserPasswd, sizeof(cli_info.UserPasswd));
         cli_info.UserPasswd[n-1] = '\0'; //取消输入的'\n'
     }
     else if(option == '2')
@@ -82,7 +88,7 @@ FIRST_IN:
         Writen(sockfd, &cli_info, sizeof(struct chat_info) - (MAXLINE-strlen(cli_info.msg)));
         PRINTF_DESTINATION();
         //需要处理同名的情况
-        n = Read(sockfd, result, 10);
+        n = Sockread(sockfd, result, 10);
         PRINTF_DESTINATION();
         clearbuf(1);
         PRINTF_DESTINATION();
@@ -101,39 +107,39 @@ FIRST_IN:
     else if(cli_info.flag == LOGIN)
     {
         printf_flush(LIGHT_CYAN"Your Name:"COLOR_NONE);
-        n = Read(fileno(stdin), cli_info.UserName, sizeof(cli_info.UserName));
+        n = Sockread(fileno(stdin), cli_info.UserName, sizeof(cli_info.UserName));
         cli_info.UserName[n-1] = '\0'; //取消输入的'\n'
 
         printf_flush(LIGHT_CYAN"Your Passwd:"COLOR_NONE);
         DEBUG_LONG("Read from input n=%d\n", n);
-        n = Read(fileno(stdin), cli_info.UserPasswd, sizeof(cli_info.UserPasswd));
+        n = Sockread(fileno(stdin), cli_info.UserPasswd, sizeof(cli_info.UserPasswd));
         DEBUG_LONG("Read from input n=%d\n", n);
         cli_info.UserPasswd[n-1] = '\0'; //取消输入的'\n'
         n = Writen(sockfd, &cli_info, sizeof(struct chat_info) - (MAXLINE-strlen(cli_info.msg)));
         DEBUG_LONG("writen to srv n=%d\n", n);
-        n = Read(sockfd, result, 10);
+        n = Sockread(sockfd, result, 10);
         DEBUG_LONG("Read from srv n=%d\n", n);
-        clearbuf(1);
+        clearbuf(1); /* 清除标准输入的缓冲区，不然下一次输入会残留，clearbuf(0)效果一样，只不过clearbuf(0)当缓冲区没有东西时，会阻塞*/
 
-        if(result[0] == 'N')
+        if(result[0] == 'N') /* 登录结果：失败，服务端发送回来的 */
         {
             printf(LIGHT_RED"User Name or Passwd Incorrect,Please Retry Below:\n"COLOR_NONE);
             clearbuf(0);
             goto FIRST_IN;
         }
-        if(result[0] == 'R')
+        if(result[0] == 'R')/* 登录结果：已经登录过了 */
         {
             printf(LIGHT_RED"The User Has Already Logined,Please Retry Below:\n"COLOR_NONE);
             clearbuf(0);
             goto FIRST_IN;
         }
-        if(result[0] == 'Y')
+        if(result[0] == 'Y')/* 登录结果：成功 */
         {
             printf(LIGHT_CYAN"Login Success,You Could Send Message To You Want!\n"COLOR_NONE);
         }
 
     }
-    cli_info.flag = SENDMSG;
+    cli_info.flag = SENDMSG; /* 注册、登录完以后其他均视为群组消息 */
     clearbuf(1);
 
 	strcli_select(stdin, sockfd, &cli_info);

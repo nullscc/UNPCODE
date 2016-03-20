@@ -1,5 +1,9 @@
 #include "chat.h"
 
+/*****************************
+ *服务端程序开始处，调用方式：“./srvchat 端口”
+ ***************************/
+
 int main(int argc, char **argv)
 {
     int listenfd;

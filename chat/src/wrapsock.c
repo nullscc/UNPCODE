@@ -1,6 +1,9 @@
 #include "wrapsock.h"
 #include "chat.h"
 
+/********************************
+ *功能：socket的包裹函数
+ ******************************/
 int Socket(int domain, int type, int protocol)
 {
 	int sockfd;
@@ -12,6 +15,9 @@ int Socket(int domain, int type, int protocol)
 	return sockfd;
 }
 
+/********************************
+ *功能：bind的包裹函数
+ ******************************/
 int Bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {
 	int ret;
@@ -23,7 +29,9 @@ int Bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 	return ret;
 }
 
-
+/********************************
+ *功能：connect的包裹函数
+ ******************************/
 int Connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {
 	int ret;
@@ -36,6 +44,9 @@ int Connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 	return ret;
 }
 
+/********************************
+ *功能：listen的包裹函数，如果环境变量LISTENQ存在，那么使用LISTENQ作为listen的参数
+ ******************************/
 int Listen(int sockfd, int backlog)
 {
 	int ret;
@@ -54,6 +65,11 @@ int Listen(int sockfd, int backlog)
 	return ret;
 }
 
+/********************************
+ *功能：accept的包裹函数，
+ *     EPROTO与ECONNABORTED表示在第一次accept之前收到了一个reset
+ *     EINTR表示被系统中断了
+ ******************************/
 int Accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 
 {
@@ -78,6 +94,7 @@ int Accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 }
 
 /*************************
+ * 功能：判断一个字符串是否是有效的IP地址表示
  * 判断一个字符串是否有效IP的要点：
  * 1、只有数字和.
  * 2、连续的数字不能超过3个
