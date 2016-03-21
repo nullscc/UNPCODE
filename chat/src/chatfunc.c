@@ -303,9 +303,10 @@ void str_echo(int listenfd)
                     {
                         if(cliselfd[i] != -1)
                         {
+                            #if !ENABLE_TEST //如果是测试的情况下，不是已登录的用户也要发送
                             if(!login_ok[i])
                                 continue;
-
+                            #endif
 
                             Writen(cliselfd[i], &cli_info, sizeof(struct chat_info) - (MAXLINE-strlen(cli_info.msg)));
                         }
@@ -341,7 +342,7 @@ void strcli_select(FILE* fp, int fd, struct chat_info *msginfo)
         DEBUG("wait for data\n");
         Select(maxfd, &sel_rdset, NULL, NULL, NULL);
         DEBUG("select return\n");
-        if(FD_ISSET(fd, &sel_rdset)) /* 表示服务端有日 */
+        if(FD_ISSET(fd, &sel_rdset)) /* 表示服务端有内容 */
         {
             if( Read(fd, &rcvinfo, sizeof(struct chat_info)) == 0)
             {
@@ -533,7 +534,6 @@ void printf_to_logfile(const char *format, ...)
 
     gettime_date(date);
     strcat(datefilename, date);
-
     fp = fopen(datefilename, "a+");
     if(fp == NULL)
     {

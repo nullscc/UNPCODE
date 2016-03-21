@@ -12,6 +12,8 @@
 #include <netinet/in.h> //struct sockaddr_in在这个头文件里面
 #include <errno.h>
 
+#define ENABLE_TEST 0
+
 #define PRINTF_RED(msg, arg...) \
     //printf("\033[1;31m" "%s %s(%d) " msg "\033[m\n", __FILE__, __FUNCTION__, __LINE__ , ##arg)
 
@@ -79,6 +81,8 @@ struct user_info
     struct sockaddr_in cliaddr;
     char cliname[25];
 };
+
+
 
 #define	max(a,b)	((a) > (b) ? (a) : (b))
 
