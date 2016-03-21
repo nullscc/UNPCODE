@@ -1,4 +1,4 @@
-CFLAG = -DENABLE_TEST=1
+CFLAG = -DENABLE_TEST=0
 
 PROGS  = clichat srvchat testchat
 OBJECT = chatfunc.o cmd.o wrapsock.o wrapio.o
