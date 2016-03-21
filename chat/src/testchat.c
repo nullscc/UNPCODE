@@ -19,6 +19,16 @@ int main(int argc, char**argv)
     char ipstr[16];
     fd_set sel_rdset;
     int nready = 0;
+    if(ENABLE_TEST)
+    {
+        printf("ENABLE_TEST\n");
+    }
+    else
+    {
+        printf("DISABLE_TEST\n");
+        printf("Please Goto Makefile edit \"CFLAG = -DENABLE_TEST=1\"\n");
+        return -1;
+    }
     if(argc != 4)
     {
         printf("Usage:%s <IPAdress/Domain> <Port> <Client Number>\n", argv[0]);

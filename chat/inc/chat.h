@@ -12,8 +12,6 @@
 #include <netinet/in.h> //struct sockaddr_in在这个头文件里面
 #include <errno.h>
 
-#define ENABLE_TEST 0
-
 #define PRINTF_RED(msg, arg...) \
     //printf("\033[1;31m" "%s %s(%d) " msg "\033[m\n", __FILE__, __FUNCTION__, __LINE__ , ##arg)
 

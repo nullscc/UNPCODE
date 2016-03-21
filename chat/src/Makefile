@@ -1,6 +1,8 @@
+CFLAG = -DENABLE_TEST=1
+
 PROGS  = clichat srvchat testchat
 OBJECT = chatfunc.o cmd.o wrapsock.o wrapio.o
-CC = gcc -I../inc
+CC = gcc -I../inc ${CFLAG}
 
 all:${PROGS}
 
