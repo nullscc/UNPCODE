@@ -63,15 +63,15 @@ void srv_handle_cmd(int fd, struct chat_info *info, int *login_ok, int maxi, str
     DEBUG("cmd is:%s\n", info->cmd);
     char unsupport[] = "unsupport instuction";
     DEBUG("excute srv_handle_cmd\n");
-    if( !strncmp(info->cmd, "onlinenum", 9) )
+    if( !strncmp(info->cmd, "onlinenum\n", strlen(info->cmd)) )
     {
         write_online_num_to_cli(fd, login_ok, maxi);
     }
-    else if( !strncmp(info->cmd, "onlinename", 10) )
+    else if( !strncmp(info->cmd, "onlinename\n", strlen(info->cmd)) )
     {
         write_online_name_to_cli(login_ok, uinfo, maxi, fd);
     }
-    else if( !strncmp(info->cmd, "help", 4) )
+    else if( !strncmp(info->cmd, "help\n", strlen(info->cmd)) )
     {
         write_help_info_to_cli(fd);
     }
@@ -97,17 +97,17 @@ void recieve_cmd_result_from_srv(int fd, struct chat_info *msginfo)
     //int n;
     DEBUG("excute recieve_cmd_result_from_srv\n");
     memset(buf, 0, sizeof(buf));
-    if( !strncmp(msginfo->cmd, "onlinenum", 9) )
+    if( !strncmp(msginfo->cmd, "onlinenum\n", strlen(msginfo->cmd)) )
     {
         Read(fd, buf, sizeof(buf));
         printf(YELLOW"%s online people\n"COLOR_NONE, buf);
     }
-    else if( !strncmp(msginfo->cmd, "onlinename", 10) )
+    else if( !strncmp(msginfo->cmd, "onlinename\n", strlen(msginfo->cmd)) )
     {
         Read(fd, buf, sizeof(buf));
         printf(YELLOW"online people:\n%s\n"COLOR_NONE, buf);
     }
-    else if( !strncmp(msginfo->cmd, "help", 4) )
+    else if( !strncmp(msginfo->cmd, "help\n", strlen(msginfo->cmd)) )
     {
         Read(fd, buf, sizeof(buf));
         printf("-------------------------------------------------------------------\n");

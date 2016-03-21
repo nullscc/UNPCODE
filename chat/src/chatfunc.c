@@ -127,9 +127,10 @@ void handle_login(struct chat_info *info, char *filename, int *login_flag, int f
                 memcpy(bufpasswd, &buf[i+1], sizeof(buf) - i - 1);
                 DEBUG("bufname is :%s\n", bufname);
                 DEBUG("info->UserName is :%s\n", info->UserName);
-                if( !strncmp(bufname, info->UserName, i) )
+
+                if( !strncmp(bufname, info->UserName, strlen(info->UserPasswd)) )
                 {
-                    if(!strncmp(bufpasswd, info->UserPasswd, strlen(bufpasswd) - i - 1))
+                    if(!strncmp(bufpasswd, info->UserPasswd, strlen(info->UserPasswd)))//strlen(bufpasswd) - i - 1))
                     {
                         DEBUG("login success\n");
                         if(has_logined(login_flag, info, uinfo, maxi))
