@@ -6,4 +6,4 @@ all:
 
 clean:
 	make -C ./src clean
-	rm -f clichat srvchat
+	rm -f clichat srvchat testchat
